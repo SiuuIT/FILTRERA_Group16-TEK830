@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'statisticWidgets/pie_chart.dart';
 import 'statisticWidgets/accident_list_widget.dart';
 import 'statisticWidgets/accidents_report_card.dart';
+import 'statisticWidgets/heatMapWidgets/app.dart';
+import 'statisticWidgets/heatMapWidgets/factory_heatmap_mvp.dart';
 //this is the usable widget
 class StatisticsAreaWidget extends StatefulWidget{
   const StatisticsAreaWidget({super.key});
@@ -36,7 +37,10 @@ Widget build(BuildContext context) {
       constraints: BoxConstraints(
         maxHeight: MediaQuery.of(context).size.height,
       ),
-      child: Column(
+      child: ListView(
+        // allow ListView to size itself inside the outer scroll view
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
         children: [
           RecentAccidentsList(allAccidents:  allAccidents),
           SafetyIncidentReportCard(
@@ -49,6 +53,11 @@ Widget build(BuildContext context) {
             incidents: 1,
             nearMisses: 0,
             generatedDate: DateTime(2025, 10, 7, 12, 51),
+          ),
+          // Give the heatmap a bounded height so it can render
+          SizedBox(
+            height: 320,
+            child: FactoryHeatmapMVP(),
           ),
         ],
       ),
