@@ -22,8 +22,8 @@
             FILTRERA
           </p>
         </div>
-        <div class="start-header">
-          <ul class="link-start">
+        <div id="start-header">
+          <ul id="link-start">
             <li>
               <a class="link-styling text" href=#introduction-section>
                 Start
@@ -45,14 +45,13 @@
               </a>
             </li>
             <li>
-              <a class="link-styling text" href="#among-us-section">
-                About Us
-              </a>
-            </li>
-
-            <li>
               <a class="link-styling text" href="#AI-section">
                 AI / References
+              </a>
+            </li>
+            <li>
+              <a class="link-styling text" href="#among-us-section">
+                About Us 
               </a>
             </li>
           </ul>
@@ -64,7 +63,7 @@
 
   <main>
     <!-- Introduktion -->
-    <section id="introduction-section">
+    <section id="introduction-section" class="scroll-adjust">
       <div id="introduction-text-block">
         <div id="introduction-title">
           <h1 class="subtitle">
@@ -85,7 +84,7 @@
     </section>
 
     <!-- Pitch  -->
-    <section id="pitch-section">
+    <section id="pitch-section" class="scroll-adjust spacing-section">
       <div id="pitch-title">
         <p class="title">
           Our Pitch
@@ -107,8 +106,8 @@
     </section>
 
     <!-- Demo-presentation -->
-    <section id="demo-presentation-section">
-      <div id="facts-block">
+    <section id="demo-presentation-section" class="scroll-adjust spacing-section">
+      <div id="facts-block" class="shadow border">
         <div id="facts-title">
           <p class="subtitle">
             With FILTRERA
@@ -145,13 +144,13 @@
         </div>
       </div>
       <div id="demo-presentation-block">
-        <div id="demo-block">
+        <div class="demo-presentation-item">
           <iframe width="550" height="350" src="https://www.youtube.com/embed/watch?v=tgbNymZ7vqY&list=RDtgbNymZ7vqY&start_radio=1" title="YouTube video player"
             frameborder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowfullscreen style="box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.8); border-radius: 20px;"></iframe>
         </div>
-        <div id="presentation-block">
+        <div class="demo-presentation-item">
           <iframe
             src="https://docs.google.com/presentation/d/e/2PACX-1vQcYyQabQAmZQfalFa7RgwtJhO0AMuugA7SRYSjlz-NUdzPw5hlO8ET3TCB3ldiaAf9ABGtgsqAgOv4/pubembed?start=false&loop=false&delayms=3000"
             frameborder="0" width="550" height="350" allowfullscreen="true" mozallowfullscreen="true"
@@ -162,7 +161,7 @@
     </section>
 
     <!-- Design thinking -->
-    <section id="design-thinking-section">
+    <section id="design-thinking-section" class="scroll-adjust spacing-section">
       <div id="design-thinking-title">
         <p class="text-bigger">
           Aligning FILTRERA with IKEA's principles
@@ -174,11 +173,9 @@
             Usability:
           </p>
           <p>
-            FILTRERA is designed for managers and supervisors within IKEA’s operations, particularly in warehouse,
-            logistics, and production environments.
-            These users need a simple and effective way to view and analyze safety incidents and risks in their daily
-            work. By enabling clear visualization of safety data,
-            improvement areas can be identified quickly to support better decision-making and prevent accidents.
+            FILTRERA is designed for managers and supervisors within IKEA’s operations. These users need a simple and 
+            effective way to view and analyze safety incidents and risks in daily tasks. By enabling clear visualization 
+            of safety data, improvement areas can be identified quickly to support better decision-making and prevent accidents.
           </p>
         </div>
         <div class="bility">
@@ -186,10 +183,8 @@
             Feasibility:
           </p>
           <p>
-            The technology behind FILTRERA is a web-based platform using HTML, CSS, and JavaScript
-            with the help of; Pandas, NumPy, RapidFuzz, and OpenPyXL, to handle data processing and analysis.
-            The technology is accessible, secure, and scalable, allowing for smooth implementation within IKEA’s
-            internal systems.
+            FILTRERA is an app developed in flutter, with the help of a python filtering backend utilizing; Pandas, NumPy, RapidFuzz and OpenPyXL. 
+            The technology is accessible and scalable allowing for smooth implementation within IKEA’s internal systems.
           </p>
         </div>
         <div class="bility">
@@ -197,10 +192,8 @@
             Viability:
           </p>
           <p>
-            FILTRERA aligns closely with IKEA’s focus on employee safety, continuous improvement,
-            and data-driven decision-making.
-            It supports IKEA’s core values of creating a safe and sustainable work environment for all, while also
-            contributing to operational efficiency and quality.
+            FILTRERA aligns closely with IKEA’s focus on employee safety, continuous improvement, and data-driven decision-making. 
+            It supports IKEA’s core values of creating a safe and sustainable work environment.
           </p>
         </div>
         <div class="bility">
@@ -208,19 +201,91 @@
             Sustainability:
           </p>
           <p>
-            By enabling faster identification and resolution of safety risks, FILTRERA helps reduce workplace
-            accidents. This minimizes sick leaves and costs, while increasing employee satisfaction.
-            We have also considered potential risks such as data privacy,
-            exclusion of non-technical users, and misinterpretation
-            of collected data—and we are actively working to design an inclusive, secure, and user-friendly interface.
+            By enabling faster identification and resolution of safety risks, FILTRERA helps reduce workplace accidents. 
+            This minimizes sick leaves and costs, while increasing employee satisfaction. We have also considered potential risks such as exclusion of non-technical users, 
+            and misinterpretation of collected data—and we are actively working to design an inclusive, secure, and user-friendly interface.
           </p>
         </div>
       </div>
     </section>
+
+    <!-- AI  -->
+    <section id="AI-section" class="scroll-adjust spacing-section">
+      <div id="AI-title">
+        <p class="title">
+          AI Usage
+        </p>
+      </div>
+      <div id="AI-block">
+        <div id="AI-question">
+          <p class="text">
+            How did we use AI in this project?
+          </p>
+        </div>
+        <div id="AI-answer">
+          <div> 
+            <p class="text-bigger bold">
+              Great question, you used AI in the following way:
+            </p>
+          </div>
+          <div class="AI-points">
+            <p class="text bold"> 
+              💡Idea Generation 
+            </p>
+            <p class="text">
+              AI helped us quickly brainstorm ideas and explore creative directions
+            </p>
+          </div>
+          <div class="AI-points">
+            <p class="text bold"> 
+              📝Content Refinement
+            </p>
+            <p class="text">
+              We used AI to enhance clarity, tone, and impact across our written content
+            </p>
+          </div>
+          <div class="AI-points">
+            <p class="text bold"> 
+              💻Coding Assistance
+            </p>
+            <p class="text">
+              AI supported our development process by suggesting, reviewing, and optimizing code
+            </p>
+          </div>
+          <div class="AI-points">
+            <p class="text bold"> 
+              ⚙️Streamlined Workflow
+            </p>
+            <p class="text">
+              Automation through AI allowed us to save time and reduce repetitive tasks
+            </p>
+          </div>
+          <div class="AI-points">
+            <p class="text bold"> 
+              🚀Faster Prototyping
+            </p>
+            <p class="text">
+              AI tools enabled us to build and test prototypes more efficiently.
+            </p>
+          </div>
+          <div class="AI-points">
+            <p class="text bold"> 
+              🎨Focus on Creativity
+            </p>
+            <p class="text">
+               With AI handling routine tasks, we could focus more on solving problems and being innovative.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- About us -->
-    <section id="among-us-section">
+    <section id="among-us-section" class="scroll-adjust spacing-section">
       <div id="among-us-title">
-        <h1>The team behind FILTRERA</h1>
+        <p class="title">
+          About us
+        </p>
       </div>
 
       <div id="among-us-content">
@@ -233,56 +298,59 @@
           <div id="team-grid">
             <div class="person">
               <img src="src/resources/boyzen/albin.jpg" alt="Albin">
-              <p>Albin Ryberg<br>albinryb</p>
+              <p class="text-small">
+                Albin Ryberg
+              </p>
+              <a href="mailto:albinryb@chalmers.se">
+                albinryb@chalmers.se
+              </a>
             </div>
             <div class="person">
               <img src="src/resources/boyzen/tedde.jpg" alt="Tedde">
-              <p>Theodor Castenström<br>thecas</p>
+              <p class="text-small">
+                Theodor Castenström
+              </p>
+              <a href="mailto:thecas@chalmers.se">
+                thecas@chalmers.se
+              </a>
             </div>
             <div class="person">
               <img src="src/resources/boyzen/tim.jpg" alt="Tim">
-              <p>Tim Tell Arvidsson<br>timte</p>
+              <p class="text-small">
+                Tim Tell Arvidsson
+              </p>
+              <a href="mailto:timte@chalmers.se">
+                timte@chalmers.se
+              </a>
             </div>
             <div class="person">
               <img src="src/resources/boyzen/gustav.jpg" alt="Gustav">
-              <p>Gustav Jansson Edholm<br>edholmg</p>
+              <p class="text-small">
+                Gustav Edholm
+              </p>
+              <a href="mailto:edholmg@chalmers.se">
+                edholmg@chalmers.se
+              </a>
             </div>
             <div class="person">
               <img src="src/resources/boyzen/josef.jpg" alt="Josef">
-              <p>Josef Wallenlind<br>josefwa</p>
+              <p class="text-small">
+                Josef Wallenlind
+              </p>
+              <a href="mailto:josefwa@chalmers.se">
+                josefwa@chalmers.se
+              </a>
             </div>
             <div class="person">
               <img src="src/resources/boyzen/emil.jpg" alt="Emil">
-              <p>Emil Burman<br>emilbur</p>
+               <p class="text-small">
+                Emil Burman
+              </p>
+              <a href="mailto:emilbur@chalmers.se">
+                emilbur@chalmers.se
+              </a>
             </div>
           </div>
-        </div>
-      </div>
-    </section>
-
-
-    <!-- AI  -->
-    <section id="AI-section">
-      <div id="AI-title">
-        <p class="subtitle">
-          AI Usage
-        </p>
-      </div>
-      <div id="AI-block">
-        <div id="AI-question">
-          <p class="text">
-            How did we use AI in this project?
-          </p>
-        </div>
-        <div id="AI-answer">
-          <p class="text"> 
-            Great question! We used AI in this project to enhance our content development
-            and streamline our workflow. Specifically, AI helped us generate ideas, refine
-            our text for clarity and impact, and assist with coding tasks. By leveraging AI
-            tools, we were able to speed up the prototyping process and explore innovative
-            solutions more efficiently. This collaboration allowed us to focus more on
-            creativity and problem-solving while ensuring high-quality results.
-          </p>
         </div>
       </div>
     </section>
@@ -311,31 +379,19 @@
     </div>
     <div id="footer-logos-block">
       <a href="https://chatgpt.com/">
-        <img class="footer-logos-small" src="src/resources/gustav-wilhelm-bilder/ChatGPT-icon.png" alt="Logo">
+        <img class="footer-logos-small" src="src/resources/gustav-wilhelm-bilder/chatgpt-footer-icon.png" alt="gpt">
       </a>
       <a href="https://chalmers.instructure.com/courses/36075/modules#module_102233">
-        <img class="footer-logos-small" src="src/resources/gustav-wilhelm-bilder/IKEA-iconv2.png" alt="Logo">
+        <img class="footer-logos-small" src="src/resources/gustav-wilhelm-bilder/IKEA-icon.png" alt="ikea">
       </a>
     </div>
-    <button class="buttons" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
-      Back To Top ↑
-    </button>
   </footer>
 
   <!-- JAVASCRIPTS -->
 
   <!-- Navbar fade effect-->
   <script>
-    window.addEventListener('scroll', function () {
-      const nav = document.getElementById('navdiv');
-      if (window.scrollY > 10) {
-        nav.classList.add('scrolled');
-      } else {
-        nav.classList.remove('scrolled');
-      }
-    });
-
-    const words = ["faster Decision-making!", "accurate conclusions!", "efficiency and clarity!", "data-Driven Culture!"];
+    const words = ["faster decision-making!", "accurate conclusions!", "efficiency and clarity!", "data-driven culture!"];
     let index = 0;
     const wordElement = document.getElementById('introduction-word-change');
 
@@ -348,6 +404,30 @@
       }, 500);
     }, 3000);
 
+    window.addEventListener("scroll", () => {
+      const sections = document.querySelectorAll("section");
+      const headerLinks = document.querySelectorAll("nav a");
+
+      let currentSection;
+
+      sections.forEach(section => {
+        const topSection = section.offsetTop;
+        const heightSection = section.offsetHeight;
+
+        if (window.scrollY >= topSection - (heightSection / 2.5)){
+          currentSection = section.id
+        }
+      })
+
+      headerLinks.forEach(link => {
+        link.classList.remove("active");
+
+        if(link.getAttribute("href") === "#" + currentSection) {
+          link.classList.add("active")
+        }
+      })
+
+    })
   </script>
 
 </body>
