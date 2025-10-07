@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'statisticWidgets/pie_chart.dart';
+import 'statisticWidgets/accident_list_widget.dart';
+import 'statisticWidgets/accidents_report_card.dart';
 //this is the usable widget
 class StatisticsAreaWidget extends StatefulWidget{
   const StatisticsAreaWidget({super.key});
@@ -11,6 +13,13 @@ class StatisticsAreaWidget extends StatefulWidget{
 class _StatisticsAreaWidgetState extends State<StatisticsAreaWidget>{
   bool showStats = false; 
   int counter = 0;
+  final List<Map<String, String>> allAccidents = [
+    {'location': 'Assembly Line 1', 'type': 'Repetitive strain injury', 'severity': 'low'},
+    {'location': 'Warehouse', 'type': 'Falling object injury', 'severity': 'high'},
+    {'location': 'Loading Dock', 'type': 'Slip and fall', 'severity': 'medium'},
+    {'location': 'Packaging Area', 'type': 'Cut injury', 'severity': 'low'},
+    {'location': 'Maintenance', 'type': 'Burn injury', 'severity': 'high'},
+  ];
   // toggles between beeing loaded and not loaded
   @override
   void initState(){
@@ -28,33 +37,18 @@ Widget build(BuildContext context) {
         maxHeight: MediaQuery.of(context).size.height,
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         children: [
-          SizedBox(
-            height: 200,
-            width: 200,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text('Accident Distribution', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                const Text('Distribution of accidents by type', style: TextStyle(fontSize: 12)),
-                // Give the chart a bounded height to avoid unbounded/Expanded inside a scrollable
-                SizedBox(height: 120, child: PieChartWidget()),
-              ],
-            ),
-          ),
-          SizedBox(
-            height: 200,
-            width: 200,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text('Accident Distribution', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                const Text('Distribution of accidents by type', style: TextStyle(fontSize: 12)),
-                // Give the chart a bounded height to avoid unbounded/Expanded inside a scrollable
-                SizedBox(height: 120, child: PieChartWidget()),
-              ],
-            ),
+          RecentAccidentsList(allAccidents:  allAccidents),
+          SafetyIncidentReportCard(
+            factoryName: "Factory B - South Plant",
+            totalEvents: 3,
+            highSeverity: 1,
+            mediumSeverity: 1,
+            lowSeverity: 1,
+            accidents: 2,
+            incidents: 1,
+            nearMisses: 0,
+            generatedDate: DateTime(2025, 10, 7, 12, 51),
           ),
         ],
       ),
