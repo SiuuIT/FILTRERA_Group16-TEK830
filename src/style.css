@@ -115,7 +115,7 @@ a:hover {
 }
 
 .spacing-section {
-  padding: 100px 0 100px 0; /* top, right, bottom, left */
+  padding: 70px 0 70px 0; /* top, right, bottom, left */
 }
 
 /* ----------- HEADER ----------- */
@@ -199,16 +199,31 @@ nav a.active {
   transition: opacity 0.5s ease-in-out;
 }
 
-/* ------------- Pitch -------------- */
-#pitch-section {
+/* ------------- Prototyp -------------- */
+#prototyp-section {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
 }
 
-#pitch-text {
+#prototyp-text {
   max-width: 800px;
+}
+
+#prototyp-image-block {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 20px;
+  padding: 20px;
+}
+
+.prototyp-image {
+  width: 700px;
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.8);
+  border-radius: 20px;
 }
 
 /* -------------Demo-presentation-section -------------- */
@@ -245,6 +260,96 @@ nav a.active {
   padding: 15px;
 }
 
+/* ------------------ Design thinking ------------------- */
+#design-thinking-section {
+  padding: 2rem;
+  background-color: #f9fafb;
+}
+
+#design-thinking-title {
+  text-align: center;
+  background-color: var(--color-ikea-blue);
+  color: white;
+  padding: 1rem;
+  border-radius: 20px;
+  margin-bottom: 2rem;
+}
+
+#design-thinking-title p {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+#design-thinking-block {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+.bility {
+  background: white;
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.bility:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 14px rgba(0, 0, 0, 0.1);
+}
+
+.bility p:first-child {
+  font-weight: bold;
+  color: var(--color-ikea-blue); /* IKEA blue */
+  margin-bottom: 0.6rem;
+  font-size: 1.1rem;
+}
+
+.bility p {
+  margin: 0 0 0.8rem;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+/* ------------------ AI ------------------- */
+#AI-section{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 100px 0 100px 0; /* top, right, bottom, left */
+}
+
+#AI-block{
+  display: flex;
+  flex-direction: column;
+  background-color: rgba(223, 218, 218, 0.3);
+  width: 55%;
+  padding: 15px;
+  border-radius: 20px;
+
+}
+
+#AI-question{
+  align-self: flex-end;
+  display: inline-block; 
+  background-color: lightgrey;
+  border-radius: 20px;
+  padding: 15px;
+}
+
+#AI-answer{
+  align-self: flex-start;
+  display: inline-block;
+  padding: 15px;
+  width: 70%;
+}
+
+.AI-points{
+  padding: 8px;
+}
 
 /* ------------- among us -------------- */
 #among-us-section {
@@ -303,97 +408,6 @@ nav a.active {
   height: auto;
   border-radius: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* ------------------ Design thinking ------------------- */
-#design-thinking-section {
-  padding: 2rem;
-  background-color: #f9fafb;
-}
-
-#design-thinking-title {
-  text-align: center;
-  background-color: var(--color-ikea-blue);
-  color: white;
-  padding: 1rem;
-  border-radius: 20px;
-  margin-bottom: 2rem;
-}
-
-#design-thinking-title p {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: bold;
-}
-
-#design-thinking-block {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.5rem;
-}
-
-.bility {
-  background: white;
-  border-radius: 20px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.bility:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 14px rgba(0, 0, 0, 0.1);
-}
-
-.bility p:first-child {
-  font-weight: bold;
-  color: #0058a3; /* IKEA blue */
-  margin-bottom: 0.6rem;
-  font-size: 1.1rem;
-}
-
-.bility p {
-  margin: 0 0 0.8rem;
-  line-height: 1.6;
-  font-size: 0.95rem;
-}
-
-/* ------------------ AI ------------------- */
-#AI-section{
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin: 100px 0 100px 0; /* top, right, bottom, left */
-}
-
-#AI-block{
-  display: flex;
-  flex-direction: column;
-  background-color: rgba(223, 218, 218, 0.3);
-  width: 55%;
-  padding: 15px;
-  border-radius: 20px;
-
-}
-
-#AI-question{
-  align-self: flex-end;
-  display: inline-block; 
-  background-color: lightgrey;
-  border-radius: 20px;
-  padding: 15px;
-}
-
-#AI-answer{
-  align-self: flex-start;
-  display: inline-block;
-  padding: 15px;
-  width: 70%;
-}
-
-.AI-points{
-  padding: 8px;
 }
 
 /* ------------------ FOOTER ------------------- */
