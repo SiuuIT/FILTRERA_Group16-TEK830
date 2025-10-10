@@ -23,7 +23,7 @@ class FactoryHeatmapMVP extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final factory = FactoryLayout(
-      imageAsset: 'assets/images/factory.jpg', // ensure the file exists here
+      imageAsset: 'assets/images/factory.jpg',
       points: [
         HeatPoint(x: 0.2, y: 0.3, intensity: 0.7),
         HeatPoint(x: 0.4, y: 0.6, intensity: 0.5),
@@ -33,40 +33,38 @@ class FactoryHeatmapMVP extends StatelessWidget {
       ],
     );
 
-    // Fill whatever space the parent provides (no fixed height here)
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        // If parent gives unbounded height/width, limit to something sensible:
-        final w = constraints.maxWidth.isFinite ? constraints.maxWidth : MediaQuery.of(context).size.width;
-        final h = constraints.maxHeight.isFinite ? constraints.maxHeight : MediaQuery.of(context).size.height * 0.5;
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.black12,
+            border: Border.all(color: Colors.grey.shade300),
+          ),
+          child: InteractiveViewer(
+            boundaryMargin: const EdgeInsets.all(50),
+            minScale: 0.5,
+            maxScale: 4.0,
+            child: AspectRatio(
+              aspectRatio: 16 / 9,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  // 🔥 Background factory layout image
+                  Image.asset(
+                    factory.imageAsset,
+                    fit: BoxFit.contain, // was cover – contain works better for scaled view
+                  ),
 
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: SizedBox(
-            width: w,
-            height: h,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                Image.asset(
-                  factory.imageAsset,
-                  fit: BoxFit.cover,
-                  errorBuilder: (c, e, s) {
-                    return Container(
-                      color: Colors.grey.shade200,
-                      child: const Center(child: Text('Image not found')),
-                    );
-                  },
-                ),
-                CustomPaint(
-                  size: Size(w, h),
-                  painter: HeatmapPainter(factory.points),
-                ),
-              ],
+                  // 🔥 Heatmap overlay
+                  CustomPaint(painter: HeatmapPainter(factory.points)),
+                ],
+              ),
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }
@@ -79,20 +77,18 @@ class HeatmapPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final baseRadius = size.shortestSide * 0.12; // scale with widget size
     for (var p in points) {
       final position = Offset(p.x * size.width, p.y * size.height);
-      final radius = baseRadius * (0.6 + p.intensity * 1.4); // vary by intensity
       final paint = Paint()
         ..shader = RadialGradient(
           colors: [
-            _getColorForIntensity(p.intensity).withOpacity(0.75),
+            _getColorForIntensity(p.intensity).withOpacity(0.7),
             Colors.transparent,
           ],
           stops: const [0.0, 1.0],
-        ).createShader(Rect.fromCircle(center: position, radius: radius));
+        ).createShader(Rect.fromCircle(center: position, radius: 80));
 
-      canvas.drawCircle(position, radius, paint);
+      canvas.drawCircle(position, 80, paint);
     }
   }
 
