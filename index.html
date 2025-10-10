@@ -56,7 +56,33 @@
             </li>
           </ul>
         </div>
-      </div>
+        <span id="burger-menu-icon" onclick="openBurger()">
+          &#9776; <!--&#9776 = menu icon  -->
+        </span>
+        <div id="burger-menu">
+          <ul>
+            <li>
+              <a>
+                Start
+              </a>
+            </li>
+            <li>
+              <a>
+                Prototyp
+              </a>
+            </li>
+            <li>
+              <a>
+                Presentation / Demo
+              </a>
+            </li>
+            <li>
+            <a id="close-icon" onclick="closeBurger()">
+              &#10005; <!-- &times = cross icon -->
+            </a>
+          </li>
+          </ul>
+        </div>
       </div>
     </nav>
   </header>
@@ -367,11 +393,8 @@
   </footer>
 
   <!-- JAVASCRIPTS -->
-  <!-- change word -->
-  <!-- mark header links-->
-
   <script>
-    
+    // CHANGE WORD
     const words = ["faster decision-making!", "accurate conclusions!", "efficiency and clarity!", "data-driven culture!"];
     let index = 0;
     const wordElement = document.getElementById('introduction-word-change');
@@ -385,6 +408,7 @@
       }, 500);
     }, 3000);
 
+    // MARK HEADER LINKS
     window.addEventListener("scroll", () => {
       const sections = document.querySelectorAll("section");
       const headerLinks = document.querySelectorAll("nav a");
@@ -409,6 +433,19 @@
       })
 
     })
+  
+
+  // BURGER MENU SCRIPT
+  function openBurger() {
+    const burgerWidth = document.getElementById("burger-menu");
+    burgerWidth.style.width = "160px";
+  }
+
+  function closeBurger() {
+    const burgerWidth = document.getElementById("burger-menu");
+    burgerWidth.style.width = "0px";
+  }
+
   </script>
 
 </body>

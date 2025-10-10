@@ -142,7 +142,7 @@ nav a.active {
   height: 70px;
   background-color: rgba(255, 255, 255, 0.98);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /*shadow*/
-  z-index: 9999;
+  z-index: 9998;
 }
 
 #filtrera-logo {
@@ -159,6 +159,62 @@ nav a.active {
 .link-styling {
   margin-right: 40px;
 }
+
+#burger-menu-icon{
+  display: none; /* Hides the element from the start */
+}
+
+#burger-menu {
+  display: none;
+}
+
+#close-icon{
+  display: none;
+}
+
+/* -------------- RESPONSIVE @MEDIA -------------- */
+@media (max-width: 1200px) {
+  #link-start {
+    display: none;
+  }
+
+  #burger-menu-icon {
+    display: block;
+    font-size: 30px;
+    color: var(--color-black);
+    margin: 0 20px 5px 0; /* top, right, bottom, left*/
+    cursor: pointer;
+    transition: 0.5s;
+  }
+  
+  #burger-menu {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    background-color: red;
+    top: 0;
+    right: 0;
+    width: 0;
+    transition: 0.5s;
+    padding-top: 10px;
+    overflow: hidden;
+    z-index: 9999;*/
+  }
+
+  #close-icon{
+    position: absolute;
+    color: var(--color-white);
+    top: 0;
+    right: 20px;
+  }
+
+  #burger-menu a  {
+    margin: 12px 6px 12px 30px;
+    font-size: 16px;
+    display: block;
+  }
+}
+
 
 /* ----------- INTRODUCTION SECTION ------------ */
 #introduction-section {
