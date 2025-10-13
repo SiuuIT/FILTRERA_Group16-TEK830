@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Query
 from fastapi.responses import JSONResponse
-from excel_data_handler import load_excel, normalize_input, fuzzy_filter
+from python_backend.excel_data_handler import load_excel, normalize_input, fuzzy_filter
 
 # Initiera FastAPI
 app = FastAPI()

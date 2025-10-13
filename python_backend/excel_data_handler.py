@@ -7,7 +7,7 @@ from rapidfuzz import fuzz
 logging.basicConfig(level=logging.INFO)
 
 BASE_DIR = os.path.dirname(__file__)
-DEFAULT_PATH = os.path.join(BASE_DIR, "..", "data_from_ikea", "FY20.xlsx")
+DEFAULT_PATH = file_path = os.path.join(BASE_DIR, "data_from_ikea", "FY20.xlsx")
 
 # --- Ladda data ---
 def load_excel(file_path: str = DEFAULT_PATH):
