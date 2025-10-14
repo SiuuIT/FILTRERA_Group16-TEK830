@@ -1,6 +1,3 @@
-// main.dart
-// Uses ApiService, dynamically fetches unique factories and categories, and shows them in dropdowns.
-
 import 'package:flutter/material.dart';
 import 'api_service.dart';
 import 'widgets/statisicAreaWidget.dart';
@@ -21,14 +18,16 @@ class _MyHomePageState extends State<MyHomePage> {
   bool showStats = false;
   int refresher = 0;
 
-  // Backend service (local FastAPI)
   final ApiService api = ApiService('http://127.0.0.1:8000');
 
-  // Dropdown data
   List<String> factories = [];
   List<String> categories = [];
   String? selectedFactory;
   String? selectedCategory;
+
+  // Text controllers for manual date input
+  final TextEditingController fromDateController = TextEditingController();
+  final TextEditingController toDateController = TextEditingController();
 
   @override
   void initState() {
@@ -77,35 +76,44 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> applyFilter() async {
-  // Build the map of filters based on selected dropdowns
-  final filters = <String, String>{};
+    final filters = <String, dynamic>{};
 
-  if (selectedFactory != null && selectedFactory!.isNotEmpty) {
-    filters['Factory'] = selectedFactory!;
+    if (selectedFactory != null && selectedFactory!.isNotEmpty) {
+      filters['Factory'] = selectedFactory!;
+    }
+    if (selectedCategory != null && selectedCategory!.isNotEmpty) {
+      filters['Category'] = selectedCategory!;
+    }
+
+    // Include manually typed date filters
+    if (fromDateController.text.isNotEmpty || toDateController.text.isNotEmpty) {
+      filters['Date'] = {
+        if (fromDateController.text.isNotEmpty) 'from': fromDateController.text,
+        if (toDateController.text.isNotEmpty) 'to': toDateController.text,
+      };
+    }
+
+    if (filters.isEmpty) {
+      debugPrint('No filters selected.');
+      return;
+    }
+
+    try {
+      final response = await api.filterData(
+        filters: filters,
+        limit: 50,
+        threshold: 70,
+      );
+
+      final results = response['results'] ?? [];
+      final aggregates = response['aggregates'] ?? {};
+
+      debugPrint('Received ${results.length} rows from backend.');
+      debugPrint('Aggregates: $aggregates');
+    } catch (e) {
+      debugPrint('Error applying filters: $e');
+    }
   }
-  if (selectedCategory != null && selectedCategory!.isNotEmpty) {
-    filters['Category'] = selectedCategory!;
-  }
-
-  if (filters.isEmpty) {
-    debugPrint('No filters selected.');
-    return;
-  }
-
-  try {
-    final results = await api.filterData(
-      filters: filters,
-      limit: 50,
-      threshold: 70,
-    );
-
-    debugPrint('Received ${results.length} rows from backend.');
-    debugPrint('what we recieved ${results}');
-  } catch (e) {
-    debugPrint('Error applying filters: $e');
-  }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -160,6 +168,25 @@ class _MyHomePageState extends State<MyHomePage> {
                                   onChanged: (value) {
                                     setState(() => selectedCategory = value);
                                   },
+                                ),
+                                const SizedBox(height: 12),
+                                // Manual date range input fields
+                                TextField(
+                                  controller: fromDateController,
+                                  decoration: const InputDecoration(
+                                    labelText: "From Date",
+                                    hintText: "Enter start date (yyyy-mm-dd)",
+                                    border: OutlineInputBorder(),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                TextField(
+                                  controller: toDateController,
+                                  decoration: const InputDecoration(
+                                    labelText: "To Date",
+                                    hintText: "Enter end date (yyyy-mm-dd)",
+                                    border: OutlineInputBorder(),
+                                  ),
                                 ),
                               ],
                             ),

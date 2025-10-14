@@ -1,5 +1,8 @@
 # api_handler.py
 # Fixed version with CORS, POST /filter, GET /columns, and GET /unique-values.
+#run this by this in terminal 
+# source ../.venv/Scripts/activate
+# uvicorn python_backend.api_handler:app --reload
 
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -71,6 +74,7 @@ def filter_data(filters: FilterRequest):
 
         normalized_value = normalize_input(value)
         filtered_df = fuzzy_filter(filtered_df, column, normalized_value, filters.threshold)
+    
     
     return {"results": filtered_df.head(filters.limit).to_dict(orient="records")}
 
