@@ -222,18 +222,27 @@ nav a.active {
 /* ----------- INTRODUCTION SECTION ------------ */
 #introduction-section {
   /*background-image: url("resources/gustav-wilhelm-bilder/data-analyst-background (1).jpg");*/
-  background-position: contain;
+  /*background-position: contain;
   background-repeat: no-repeat;
   background-size: 100% 600px;
   background-color: lightblue;
   
+  width: 100%;
+  height: 80vh;*/
+}
+
+.introduction-background-image{
+  width: 100%;
+  height: 20vh;
+}
+
+#introduction-middle-block {
+  background-color: red;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
   gap: 20%;
-  /*height: 80vh;*/
-  width: 100%;
 }
 
 #introduction-text-block {
@@ -241,7 +250,6 @@ nav a.active {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  background-color: saddlebrown;
 }
 
 #introduction-text {
