@@ -80,11 +80,21 @@ def apply_filters(df, filters: dict, threshold: int = 60, limit: int = 100):
         else:
             incident_sum += filtered_df[col].notna().sum()
 
-    # Collect description texts if column exists
+    
     # Collect description texts if column exists
     descriptions = []
-    if "What happened?" in filtered_df.columns:
-        descriptions = filtered_df["What happened?"].dropna().astype(str).tolist()
+    if "What happened?" in filtered_df.columns and "Where did it happen" in filtered_df.columns:
+        combined = (
+            filtered_df.apply(
+                lambda row: f"Location: {row['Where did it happen']} — Incident: {row['What happened?']}",
+                axis=1,
+            )
+            .dropna()
+            .astype(str)
+            .tolist()
+        )
+        descriptions = combined
+        
 
     return {
         #"results": filtered_df.head(limit).to_dict(orient="records"),

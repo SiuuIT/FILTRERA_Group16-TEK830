@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from python_backend.excel_data_handler import load_excel, apply_filters
-from python_backend.ai_analysis import analyze_descriptions
+from python_backend.ai_analysis import analyze_location_and_description
 import logging
 import pandas as pd
 # api_handler.py
@@ -41,7 +41,7 @@ def filter_data(request: FilterRequest):
         result = apply_filters(df, request.filters, request.threshold, request.limit)
 
         # Add AI-generated safety summary
-        ai_summary = analyze_descriptions(result.get("descriptions", []))
+        ai_summary = analyze_location_and_description(result.get("descriptions", []))
         print("AI Summary:", ai_summary)  # Debug print
         result["AIAnswer"] = ai_summary
         del result["descriptions"]  # remove raw descriptions from output
