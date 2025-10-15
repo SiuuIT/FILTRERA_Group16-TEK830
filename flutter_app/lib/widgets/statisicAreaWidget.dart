@@ -4,7 +4,11 @@ import 'statisticWidgets/accidents_report_card.dart';
 import 'statisticWidgets/heatMapWidgets/factory_heatmap_mvp.dart';
 //this is the usable widget
 class StatisticsAreaWidget extends StatefulWidget{
-  const StatisticsAreaWidget({super.key});
+  final Map<String, dynamic> aggregates;
+  final String aiAnswer;
+  const StatisticsAreaWidget({super.key
+  ,required this.aggregates, 
+  required this.aiAnswer});
   @override
   State<StatisticsAreaWidget> createState() => _StatisticsAreaWidgetState();
 
@@ -64,6 +68,19 @@ Widget build(BuildContext context) {
           ],
         ),
       ),
+      //this is just a simple ai section
+      if (widget.aiAnswer.isNotEmpty)
+        TextField(
+          controller: TextEditingController(text: widget.aiAnswer),
+          readOnly: true,
+          maxLines: null,
+          decoration: const InputDecoration(
+            labelText: "AI's Safety Summary",
+            border: OutlineInputBorder(),
+          ),
+        )
+      else
+        const Text("No AI analysis available yet."),
       RecentAccidentsList(allAccidents: allAccidents),
       SafetyIncidentReportCard(
         factoryName: "Factory B - South Plant",

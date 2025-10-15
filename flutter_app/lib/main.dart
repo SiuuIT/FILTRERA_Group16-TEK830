@@ -17,6 +17,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   bool showStats = false;
   int refresher = 0;
+  
 
   final ApiService api = ApiService('http://127.0.0.1:8000');
 
@@ -24,6 +25,9 @@ class _MyHomePageState extends State<MyHomePage> {
   List<String> categories = [];
   String? selectedFactory;
   String? selectedCategory;
+
+  Map<String, dynamic> aggregates = {}; // Store aggregates from backend
+  String aiAnswer = '';
 
   // Text controllers for manual date input
   final TextEditingController fromDateController = TextEditingController();
@@ -105,10 +109,12 @@ class _MyHomePageState extends State<MyHomePage> {
         threshold: 70,
       );
 
-      final results = response['results'] ?? [];
-      final aggregates = response['aggregates'] ?? {};
+    setState(() {
+      aggregates = Map<String, dynamic>.from(response['aggregates'] ?? {});
+      aiAnswer = response['AIAnswer'] ?? '';
+    });
 
-      debugPrint('Received ${results.length} rows from backend.');
+  
       debugPrint('Aggregates: $aggregates');
     } catch (e) {
       debugPrint('Error applying filters: $e');
@@ -227,7 +233,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 height: double.infinity,
                 child: Center(
                   child: showStats
-                      ? StatisticsAreaWidget(key: ValueKey(refresher))
+                      ? StatisticsAreaWidget(
+                          key: ValueKey(refresher),
+                          aggregates: aggregates,
+                          aiAnswer: aiAnswer,
+                          )
                       : const Text('Main Area'),
                 ),
               ),
