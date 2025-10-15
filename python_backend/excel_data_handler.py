@@ -87,7 +87,7 @@ def apply_filters(df, filters: dict, threshold: int = 60, limit: int = 100):
         descriptions = filtered_df["What happened?"].dropna().astype(str).tolist()
 
     return {
-        "results": filtered_df.head(limit).to_dict(orient="records"),
+        #"results": filtered_df.head(limit).to_dict(orient="records"),
         "aggregates": {
             "rows": len(filtered_df),
             "accidents": int(accident_sum),

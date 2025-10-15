@@ -42,6 +42,7 @@ def filter_data(request: FilterRequest):
 
         # Add AI-generated safety summary
         ai_summary = analyze_descriptions(result.get("descriptions", []))
+        print("AI Summary:", ai_summary)  # Debug print
         result["AIAnswer"] = ai_summary
         del result["descriptions"]  # remove raw descriptions from output
 
