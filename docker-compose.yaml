@@ -1,0 +1,20 @@
+version: "3.8"
+
+services:
+  backend:
+    build: ./python_backend
+    container_name: fastapi-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./python_backend:/app  # Optional for live reload in dev
+
+  frontend:
+    build: ./flutter_app
+    container_name: flutter-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
