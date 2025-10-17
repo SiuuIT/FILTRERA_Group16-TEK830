@@ -1,13 +1,14 @@
 # Stage 1: Build Flutter Web app
-FROM ghcr.io/cirruslabs/flutter:3.24.0 AS build
-
+FROM ghcr.io/cirruslabs/flutter:3.35.6 AS build
 WORKDIR /app
-COPY flutter_app .
+
+# Copy all files from the flutter_app folder (context is flutter_app/)
+COPY . .
 
 # Fetch dependencies
 RUN flutter pub get
 
-# Build the web app
+# Build the Flutter web app
 RUN flutter build web
 
 # Stage 2: Serve with Nginx
@@ -18,5 +19,4 @@ COPY --from=build /app/build/web /usr/share/nginx/html
 
 EXPOSE 80
 
-# Run Nginx
 CMD ["nginx", "-g", "daemon off;"]
