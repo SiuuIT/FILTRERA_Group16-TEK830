@@ -9,6 +9,8 @@ services:
       - PYTHONUNBUFFERED=1
     volumes:
       - ./python_backend:/app  # Optional for live reload in dev
+      - ./data_from_ikea:/app/data_from_ikea
+
 
   frontend:
     build: ./flutter_app
