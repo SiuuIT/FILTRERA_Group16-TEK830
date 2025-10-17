@@ -8,7 +8,7 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
     volumes:
-      - ./python_backend:/app  # Optional for live reload in dev
+      - ./python_backend:/app  
       - ./data_from_ikea:/app/data_from_ikea
 
 
