@@ -1,6 +1,7 @@
 import os
 from openai import OpenAI
 import asyncio
+import json
 
 def analyze_descriptions(descriptions: list[str]) -> str:
     """Analyze and summarize incident descriptions using OpenAI (thread-safe for FastAPI)."""
@@ -43,20 +44,19 @@ def analyze_location_and_description(descriptions: list[str]) -> str:
     combined = "\n".join(descriptions[:100])
 
     prompt = (
-        "You are an IKEA workplace safety analyst. Below is a list of short incident reports. "
-        "Each line includes the location and what happened, using this format:\n"
+        "You are an IKEA workplace safety analyst. Below is a list of short incident reports, "
+        "each with a location and what happened. Format:\n"
         "'Location: [area] — Incident: [description]'.\n\n"
-        "Your task is to carefully read all reports and group them by location. "
-        "For each location, identify the **most common or serious type of problem** mentioned there.\n\n"
-        "Provide your answer as a clean, concise list like this:\n\n"
-        "Location: Glue Kitchen — Main issue: Exposed wiring and unsafe electrical setups\n"
-        "Location: Press Area — Main issue: Outdated fire signage and poor labeling\n"
-        "Location: Foiling Line — Main issue: Unsafe chemical handling\n\n"
-        "Do not repeat identical locations more than once. "
-        "If multiple issues appear equally often, choose the one that seems most impactful.\n\n"
+        "Group incidents by location and identify the main recurring issue for each area.\n\n"
+        "Return your result strictly as a valid JSON object where each key is the location "
+        "and each value is a short text description of the main issue. Example:\n\n"
+        "{\n"
+        "  \"Glue Kitchen\": \"Unsafe electrical setups\",\n"
+        "  \"Press\": \"Outdated fire signage\"\n"
+        "}\n\n"
+        "Do not include explanations, markdown, or any other text — only the JSON object.\n\n"
         "Here are the reports:\n"
-        f"{combined}\n\n"
-        "Now provide your analysis as a clear list, one location per line."
+        f"{combined}"
     )
     
 
@@ -70,8 +70,18 @@ def analyze_location_and_description(descriptions: list[str]) -> str:
         )
         return response.choices[0].message.content.strip()
 
+
     try:
         # Run safely even if called from a sync FastAPI route
-        return asyncio.run(_call_openai())
+        raw_response = asyncio.run(_call_openai())
+
+        #  Try to parse JSON safely
+        try:
+            parsed = json.loads(raw_response)
+            return parsed  # return Python dict if valid JSON
+        except json.JSONDecodeError:
+            # fallback: return raw string if not valid JSON
+            return {"error": "Failed to parse AI JSON", "raw": raw_response}
+
     except Exception as e:
-        return f"AI analysis failed: {e}"
+        return {"error": f"AI analysis failed: {e}"}

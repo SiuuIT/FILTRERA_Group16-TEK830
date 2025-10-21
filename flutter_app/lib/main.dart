@@ -27,7 +27,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String? selectedCategory;
 
   Map<String, dynamic> aggregates = {}; // Store aggregates from backend
-  String aiAnswer = '';
+  Map<String, dynamic>? aiAnswer;
 
   // Text controllers for manual date input
   final TextEditingController fromDateController = TextEditingController();
@@ -109,10 +109,16 @@ class _MyHomePageState extends State<MyHomePage> {
         threshold: 70,
       );
 
-    setState(() {
-      aggregates = Map<String, dynamic>.from(response['aggregates'] ?? {});
-      aiAnswer = response['AIAnswer'] ?? '';
-    });
+      setState(() {
+        aggregates = Map<String, dynamic>.from(response['aggregates'] ?? {});
+        final rawAI = response['AIAnswer'];
+
+        if (rawAI is Map<String, dynamic>) {
+          aiAnswer = rawAI;
+        } else {
+          aiAnswer = {'summary': rawAI.toString()}; // fallback if it's plain text
+        }
+      });
 
   
       debugPrint('Aggregates: $aggregates');
