@@ -1,6 +1,3 @@
-# --- excel_data_handler.py ---
-# FIXED: Cleaned up and clarified paths, added normalization and fuzzy match utilities.
-
 import os
 import logging
 import pandas as pd
@@ -10,10 +7,9 @@ from rapidfuzz import fuzz
 logging.basicConfig(level=logging.INFO)
 
 BASE_DIR = os.path.dirname(__file__)
-DEFAULT_PATH = os.path.join(BASE_DIR, "data_from_ikea", "FY20.xlsx")
+DEFAULT_PATH = os.path.join(BASE_DIR, "data_from_ikea", "ikea_factory_data.xlsx")
 
 def load_excel(file_path: str = DEFAULT_PATH):
-    """Load Excel data and sanitize it."""
     try:
         logging.info(f"Laddar Excel-fil från: {file_path}")
         if not os.path.exists(file_path):
@@ -25,45 +21,41 @@ def load_excel(file_path: str = DEFAULT_PATH):
         logging.exception(f"Fel vid laddning av Excel: {ex}")
         return None
 
-# Optional synonym normalization
 def normalize_input(user_input: str):
     if not user_input:
         return user_input
     return str(user_input).strip().lower()
 
 def fuzzy_filter(df_local, column, user_input, threshold):
-    """Fuzzy match rows in a DataFrame column."""
     cleaned_col = df_local[column].fillna("").astype(str).str.lower().str.strip()
     cleaned_input = str(user_input).lower().strip()
     mask = cleaned_col.apply(lambda x: fuzz.ratio(x, cleaned_input) >= threshold)
     return df_local[mask]
 
 def apply_filters(df, filters: dict, threshold: int = 60, limit: int = 100):
-    """Apply filters, count accidents/incidents, and collect descriptions."""
     filtered_df = df.copy()
+    filtered_df.columns = filtered_df.columns.str.strip().str.lower()
 
     for column, value in filters.items():
-        if column not in filtered_df.columns:
+        column_lower = column.lower()
+        if column_lower not in filtered_df.columns:
             raise ValueError(f"Kolumn '{column}' finns inte i datan.")
 
-        # Date filtering
         if isinstance(value, dict) and ("from" in value or "to" in value):
-            filtered_df[column] = pd.to_datetime(filtered_df[column], errors="coerce")
+            filtered_df[column_lower] = pd.to_datetime(filtered_df[column_lower], errors="coerce")
             from_date = pd.to_datetime(value.get("from"), errors="coerce") if value.get("from") else None
             to_date = pd.to_datetime(value.get("to"), errors="coerce") if value.get("to") else None
             if from_date is not None:
-                filtered_df = filtered_df[filtered_df[column] >= from_date]
+                filtered_df = filtered_df[filtered_df[column_lower] >= from_date]
             if to_date is not None:
-                filtered_df = filtered_df[filtered_df[column] <= to_date]
+                filtered_df = filtered_df[filtered_df[column_lower] <= to_date]
             continue
 
-        # Text fuzzy filtering
         normalized_value = normalize_input(value)
-        filtered_df = fuzzy_filter(filtered_df, column, normalized_value, threshold)
+        filtered_df = fuzzy_filter(filtered_df, column_lower, normalized_value, threshold)
 
-    # Accident/incident aggregation
-    accident_cols = [c for c in filtered_df.columns if "accident" in c.lower()]
-    incident_cols = [c for c in filtered_df.columns if "incident" in c.lower()]
+    accident_cols = [c for c in filtered_df.columns if "accident" in c]
+    incident_cols = [c for c in filtered_df.columns if "incident" in c]
 
     accident_sum = 0
     incident_sum = 0
@@ -80,13 +72,20 @@ def apply_filters(df, filters: dict, threshold: int = 60, limit: int = 100):
         else:
             incident_sum += filtered_df[col].notna().sum()
 
-    
-    # Collect description texts if column exists
+    location_counts = {}
+    if "where did it happened" in filtered_df.columns:
+        location_series = filtered_df["where did it happened"].dropna().astype(str)
+        for loc in location_series:
+            loc = loc.strip()
+            if not loc:
+                continue
+            location_counts[loc] = location_counts.get(loc, 0) + 1
+
     descriptions = []
-    if "What happened?" in filtered_df.columns and "Where did it happen" in filtered_df.columns:
+    if "what happened" in filtered_df.columns and "where did it happened" in filtered_df.columns:
         combined = (
             filtered_df.apply(
-                lambda row: f"Location: {row['Where did it happen']} — Incident: {row['What happened?']}",
+                lambda row: f"Location: {row['where did it happened']} — Incident: {row['what happened']}",
                 axis=1,
             )
             .dropna()
@@ -94,14 +93,13 @@ def apply_filters(df, filters: dict, threshold: int = 60, limit: int = 100):
             .tolist()
         )
         descriptions = combined
-        
 
     return {
-        #"results": filtered_df.head(limit).to_dict(orient="records"),
         "aggregates": {
             "rows": len(filtered_df),
             "accidents": int(accident_sum),
             "incidents": int(incident_sum),
         },
+        "location_counts": location_counts,
         "descriptions": descriptions,
     }

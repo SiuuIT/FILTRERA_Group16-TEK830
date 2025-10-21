@@ -11,7 +11,7 @@ import pandas as pd
 #run this by this in terminal 
 # source ../.venv/Scripts/activate
 # uvicorn python_backend.api_handler:app --reload
-#also need to set up api kay at start every server startup $env:OPENAI_API_KEY="sk-your-key-here"
+#also need to set up api key at start every server startup $env:OPENAI_API_KEY="sk-your-key-here"
 #http://127.0.0.1:8000/docs debug serber with this
 app = FastAPI(title="IKEA Filter API")
 
