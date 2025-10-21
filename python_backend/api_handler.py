@@ -2,8 +2,8 @@ from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from python_backend.excel_data_handler import load_excel, apply_filters
-from python_backend.ai_analysis import analyze_location_and_description
+from excel_data_handler import load_excel, apply_filters
+from ai_analysis import analyze_location_and_description
 import logging
 import pandas as pd
 # api_handler.py
