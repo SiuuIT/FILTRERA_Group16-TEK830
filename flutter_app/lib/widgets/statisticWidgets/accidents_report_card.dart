@@ -47,7 +47,7 @@ class SafetyIncidentReportCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 🔹 Title
+          //  Title
           const Text(
             "Safety Incident Report",
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -60,7 +60,7 @@ class SafetyIncidentReportCard extends StatelessWidget {
 
           const SizedBox(height: 10),
 
-          // 🔹 Top row: Date info
+          //  Top row: Date info
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
@@ -76,46 +76,9 @@ class SafetyIncidentReportCard extends StatelessWidget {
 
           const SizedBox(height: 12),
 
-          // 🔹 Severity summary row
-          Row(
-            children: [
-              _buildSummaryBox(
-                context,
-                count: totalEvents,
-                label: "Total Events",
-                color: Colors.grey.shade100,
-                textColor: Colors.black87,
-              ),
-              const SizedBox(width: 8),
-              _buildSummaryBox(
-                context,
-                count: highSeverity,
-                label: "High Severity",
-                color: Colors.red.shade50,
-                textColor: Colors.red.shade700,
-              ),
-              const SizedBox(width: 8),
-              _buildSummaryBox(
-                context,
-                count: mediumSeverity,
-                label: "Medium Severity",
-                color: Colors.orange.shade50,
-                textColor: Colors.orange.shade700,
-              ),
-              const SizedBox(width: 8),
-              _buildSummaryBox(
-                context,
-                count: lowSeverity,
-                label: "Low Severity",
-                color: Colors.yellow.shade50,
-                textColor: Colors.orange.shade800,
-              ),
-            ],
-          ),
+          // --- Removed severity and total event widgets (as requested) ---
 
-          const SizedBox(height: 12),
-
-          // 🔹 Lower summary row
+          //  Lower summary row (kept)
           Row(
             children: [
               _buildSummaryBox(context,
