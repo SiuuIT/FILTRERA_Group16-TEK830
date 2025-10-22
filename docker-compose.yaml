@@ -21,4 +21,3 @@ services:
       - backend
     volumes:
       - ./flutter_app:/app
-      - ./flutter_app/assets/images:/app/assets/images
