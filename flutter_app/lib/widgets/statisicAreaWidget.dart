@@ -3,18 +3,95 @@ import 'statisticWidgets/accident_list_widget.dart';
 import 'statisticWidgets/accidents_report_card.dart';
 import 'statisticWidgets/heatMapWidgets/factory_heatmap_mvp.dart';
 
+/// ---- helpers ---------------------------------------------------------------
+
+String _norm(String s) =>
+    s.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '');
+
+int _coerceToInt(dynamic v) {
+  if (v is int) return v;
+  if (v is num) return v.toInt();
+  if (v is String) return int.tryParse(v) ?? 0;
+  return 0;
+}
+
+/// Reads an int from a (possibly messy) aggregates map by trying several
+/// candidate keys and doing light normalization (case / underscores).
+int _readIntFromAggregates(
+  Map<String, dynamic> aggregates,
+  List<String> candidateKeys,
+) {
+  if (aggregates.isEmpty) return 0;
+
+  // 1) direct hit with normalization
+  final normToKey = {
+    for (final k in aggregates.keys) _norm(k): k,
+  };
+
+  for (final cand in candidateKeys) {
+    final hit = normToKey[_norm(cand)];
+    if (hit != null) return _coerceToInt(aggregates[hit]);
+  }
+
+  // 2) one-level nested maps: look into Map values
+  for (final value in aggregates.values) {
+    if (value is Map) {
+      final nested = Map<String, dynamic>.from(value as Map);
+      final nestedNorm = {
+        for (final k in nested.keys) _norm(k.toString()): k.toString(),
+      };
+      for (final cand in candidateKeys) {
+        final hit = nestedNorm[_norm(cand)];
+        if (hit != null) return _coerceToInt(nested[hit]);
+      }
+    }
+  }
+
+  return 0;
+}
+
+/// ---------------------------------------------------------------------------
+
 /// The main statistics area shown on the right side of your UI.
 class StatisticsAreaWidget extends StatefulWidget {
   final Map<String, dynamic> aggregates;
   final Map<String, dynamic>? aiAnswer;
-  final Map<String, dynamic>? locationCounts; // <-- Added
+  final Map<String, dynamic>? locationCounts; // counts all locations
+  final int accidentsCount;
+  final int incidentsCount;
 
-  const StatisticsAreaWidget({
-    super.key,
-    required this.aggregates,
+  /// You can optionally pass custom keys if your backend uses different names.
+  StatisticsAreaWidget({
+    Key? key,
+    required Map<String, dynamic> aggregates,
     required this.aiAnswer,
-    this.locationCounts, // <-- Added
-  });
+    this.locationCounts,
+    String? accidentsKey, // e.g. "totalAccidents"
+    String? incidentsKey, // e.g. "total_incidents"
+  })  : aggregates = aggregates,
+        accidentsCount = _readIntFromAggregates(
+          aggregates,
+          [
+            if (accidentsKey != null) accidentsKey,
+            'total_accidents',
+            'accidents_total',
+            'accident_total',
+            'accidents',
+            'totalAccidents',
+          ],
+        ),
+        incidentsCount = _readIntFromAggregates(
+          aggregates,
+          [
+            if (incidentsKey != null) incidentsKey,
+            'total_incidents',
+            'incidents_total',
+            'incident_total',
+            'incidents',
+            'totalIncidents',
+          ],
+        ),
+        super(key: key);
 
   @override
   State<StatisticsAreaWidget> createState() => _StatisticsAreaWidgetState();
@@ -42,12 +119,12 @@ class _StatisticsAreaWidgetState extends State<StatisticsAreaWidget> {
   @override
   Widget build(BuildContext context) {
     final aiData = widget.aiAnswer ?? {};
-    final locationCounts = widget.locationCounts ?? {}; // <-- Extract safe map
+    final locationCounts = widget.locationCounts ?? {};
 
     return ListView(
       padding: const EdgeInsets.all(8.0),
       children: [
-        // --- Heatmap section ---
+        // Heatmap
         Container(
           decoration: BoxDecoration(
             color: Colors.white,
@@ -63,26 +140,22 @@ class _StatisticsAreaWidgetState extends State<StatisticsAreaWidget> {
           padding: const EdgeInsets.all(8),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Padding(
+            children: const [
+              Padding(
                 padding: EdgeInsets.all(8.0),
                 child: Text(
                   "Factory Heatmap",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
-              // Pass backend data to heatmap
-              FactoryHeatmapMVP(locationCounts: locationCounts),
             ],
           ),
         ),
+        FactoryHeatmapMVP(locationCounts: locationCounts),
 
         const SizedBox(height: 16),
 
-        // --- AI section ---
+        // AI section
         const Text(
           "AI Safety Summary by Location",
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -99,8 +172,8 @@ class _StatisticsAreaWidgetState extends State<StatisticsAreaWidget> {
                 subtitle: Text(entry.value.toString()),
               ),
             ),
-          ),
-        if (aiData.isEmpty)
+          )
+        else
           const Padding(
             padding: EdgeInsets.all(12),
             child: Text("No AI analysis available yet."),
@@ -108,14 +181,14 @@ class _StatisticsAreaWidgetState extends State<StatisticsAreaWidget> {
 
         const SizedBox(height: 16),
 
-        // --- Recent accidents list ---
+        // Recent accidents list
         RecentAccidentsList(allAccidents: allAccidents),
 
-        // --- Example report card (static sample) ---
+        // Report card (uses dynamic counts)
         SafetyIncidentReportCard(
           factoryName: "Factory B - South Plant",
-          accidents: 2,
-          incidents: 1,
+          accidents: widget.accidentsCount,
+          incidents: widget.incidentsCount,
           generatedDate: DateTime(2025, 10, 7, 12, 51),
         ),
       ],
