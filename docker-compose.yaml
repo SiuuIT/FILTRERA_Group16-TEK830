@@ -9,7 +9,7 @@ services:
       - PYTHONUNBUFFERED=1
     volumes:
       - ./python_backend:/app  
-      - ./data_from_ikea:/app/data_from_ikea
+      - ./python_backend/data_from_ikea:/app/data_from_ikea
 
 
   frontend:
