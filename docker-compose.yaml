@@ -19,3 +19,6 @@ services:
       - "8080:80"
     depends_on:
       - backend
+    volumes:
+      - ./flutter_app:/app
+      - ./flutter_app/assets/images:/app/assets/images
