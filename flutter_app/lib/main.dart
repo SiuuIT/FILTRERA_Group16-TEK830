@@ -167,18 +167,10 @@ class _MyHomePageState extends State<MyHomePage> {
                               children: [
                                 CustomDropdown(
                                   label: "Factory",
-                                  items: factories.isNotEmpty ? factories : ['Loading...'],
+                                  items:[ 'IKEA Kazlu Ruda' ],
                                   initialValue: selectedFactory,
                                   onChanged: (value) {
-                                    setState(() => selectedFactory = value);
-                                  },
-                                ),
-                                CustomDropdown(
-                                  label: "Category",
-                                  items: categories.isNotEmpty ? categories : ['Loading...'],
-                                  initialValue: selectedCategory,
-                                  onChanged: (value) {
-                                    setState(() => selectedCategory = value);
+                                    setState(() => selectedFactory = "IKEA Kazlu Ruda");
                                   },
                                 ),
                                 const SizedBox(height: 12),
