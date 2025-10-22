@@ -7,11 +7,13 @@ import 'statisticWidgets/heatMapWidgets/factory_heatmap_mvp.dart';
 class StatisticsAreaWidget extends StatefulWidget {
   final Map<String, dynamic> aggregates;
   final Map<String, dynamic>? aiAnswer;
+  final Map<String, dynamic>? locationCounts; // <-- Added
 
   const StatisticsAreaWidget({
     super.key,
     required this.aggregates,
     required this.aiAnswer,
+    this.locationCounts, // <-- Added
   });
 
   @override
@@ -40,14 +42,12 @@ class _StatisticsAreaWidgetState extends State<StatisticsAreaWidget> {
   @override
   Widget build(BuildContext context) {
     final aiData = widget.aiAnswer ?? {};
+    final locationCounts = widget.locationCounts ?? {}; // <-- Extract safe map
 
     return ListView(
       padding: const EdgeInsets.all(8.0),
       children: [
-        //  Aggregate summary (rows, incidents, etc.)
-        
-
-        //  Heatmap section
+        // --- Heatmap section ---
         Container(
           decoration: BoxDecoration(
             color: Colors.white,
@@ -61,10 +61,10 @@ class _StatisticsAreaWidgetState extends State<StatisticsAreaWidget> {
             ],
           ),
           padding: const EdgeInsets.all(8),
-          child: const Column(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
+              const Padding(
                 padding: EdgeInsets.all(8.0),
                 child: Text(
                   "Factory Heatmap",
@@ -74,14 +74,15 @@ class _StatisticsAreaWidgetState extends State<StatisticsAreaWidget> {
                   ),
                 ),
               ),
-              FactoryHeatmapMVP(),
+              // Pass backend data to heatmap
+              FactoryHeatmapMVP(locationCounts: locationCounts),
             ],
           ),
         ),
 
         const SizedBox(height: 16),
 
-        //  AI section
+        // --- AI section ---
         const Text(
           "AI Safety Summary by Location",
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -107,24 +108,17 @@ class _StatisticsAreaWidgetState extends State<StatisticsAreaWidget> {
 
         const SizedBox(height: 16),
 
-        //  Recent accidents list
+        // --- Recent accidents list ---
         RecentAccidentsList(allAccidents: allAccidents),
 
-        //  Example of report card (static sample)
+        // --- Example report card (static sample) ---
         SafetyIncidentReportCard(
           factoryName: "Factory B - South Plant",
-          totalEvents: 3,
-          highSeverity: 1,
-          mediumSeverity: 1,
-          lowSeverity: 1,
           accidents: 2,
           incidents: 1,
-          nearMisses: 0,
           generatedDate: DateTime(2025, 10, 7, 12, 51),
         ),
       ],
     );
   }
-
-
 }

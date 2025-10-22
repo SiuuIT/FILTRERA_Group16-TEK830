@@ -17,7 +17,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   bool showStats = false;
   int refresher = 0;
-  
+  Map<String, dynamic> locationCounts = {};
 
   final ApiService api = ApiService('http://127.0.0.1:8000');
 
@@ -112,6 +112,8 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {
         aggregates = Map<String, dynamic>.from(response['aggregates'] ?? {});
         final rawAI = response['AIAnswer'];
+        locationCounts = Map<String, dynamic>.from(response['location_counts'] ?? {});
+        //print('LocationCounts received: ${widget.locationCounts}');
 
         if (rawAI is Map<String, dynamic>) {
           aiAnswer = rawAI;
@@ -179,7 +181,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   controller: fromDateController,
                                   decoration: const InputDecoration(
                                     labelText: "From Date",
-                                    hintText: "Enter start date (yyyy-mm-dd)",
+                                    hintText: "(yyyy-mm-dd)",
                                     border: OutlineInputBorder(),
                                   ),
                                 ),
@@ -188,7 +190,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   controller: toDateController,
                                   decoration: const InputDecoration(
                                     labelText: "To Date",
-                                    hintText: "Enter end date (yyyy-mm-dd)",
+                                    hintText: "(yyyy-mm-dd)",
                                     border: OutlineInputBorder(),
                                   ),
                                 ),
@@ -235,6 +237,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           key: ValueKey(refresher),
                           aggregates: aggregates,
                           aiAnswer: aiAnswer,
+                          locationCounts: locationCounts,
                           )
                       : const Text('Main Area'),
                 ),

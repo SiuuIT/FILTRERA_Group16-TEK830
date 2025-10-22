@@ -3,25 +3,16 @@ import 'package:intl/intl.dart';
 
 class SafetyIncidentReportCard extends StatelessWidget {
   final String factoryName;
-  final int totalEvents;
-  final int highSeverity;
-  final int mediumSeverity;
-  final int lowSeverity;
   final int accidents;
   final int incidents;
-  final int nearMisses;
+
   final DateTime generatedDate;
 
   const SafetyIncidentReportCard({
     super.key,
     required this.factoryName,
-    required this.totalEvents,
-    required this.highSeverity,
-    required this.mediumSeverity,
-    required this.lowSeverity,
-    required this.accidents,
     required this.incidents,
-    required this.nearMisses,
+    required this.accidents,
     required this.generatedDate,
   });
 
@@ -86,9 +77,7 @@ class SafetyIncidentReportCard extends StatelessWidget {
               const SizedBox(width: 8),
               _buildSummaryBox(context,
                   count: incidents, label: "Incidents"),
-              const SizedBox(width: 8),
-              _buildSummaryBox(context,
-                  count: nearMisses, label: "Near Misses"),
+            
             ],
           ),
         ],
