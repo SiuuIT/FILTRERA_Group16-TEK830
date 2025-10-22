@@ -3,6 +3,8 @@ WORKDIR /app
 
 COPY . .
 
+RUN flutter clean
+
 RUN flutter pub get
 
 RUN flutter build web
