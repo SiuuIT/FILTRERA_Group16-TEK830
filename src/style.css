@@ -363,7 +363,13 @@ nav a.active {
 
 #among-us-title {
   text-align: center;
+  width: 100%;
   margin-bottom: 1rem;
+  background-color: var(--color-ikea-blue);
+  color: white;
+  padding: 1rem;
+  border-radius: 20px;
+  margin-bottom: 2rem;
 }
 
 #among-us-content {
