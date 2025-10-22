@@ -89,7 +89,7 @@ class _MyHomePageState extends State<MyHomePage> {
       filters['Category'] = selectedCategory!;
     }
     if (fromDateController.text.isNotEmpty || toDateController.text.isNotEmpty) {
-      filters['Date'] = {
+      filters['When did it happen?'] = {
         if (fromDateController.text.isNotEmpty) 'from': fromDateController.text,
         if (toDateController.text.isNotEmpty) 'to': toDateController.text,
       };

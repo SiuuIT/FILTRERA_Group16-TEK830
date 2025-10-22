@@ -35,8 +35,9 @@ def fuzzy_filter(df_local, column, user_input, threshold):
 def apply_filters(df, filters: dict, threshold: int = 60, limit: int = 100):
   filtered_df = df.copy()
   filtered_df.columns = filtered_df.columns.str.strip().str.lower()
-
+  
   for column, value in filters.items():
+    print(f"Columns {column}")
     column_lower = column.lower()
     if column_lower not in filtered_df.columns:
       raise ValueError(f"Kolumn '{column}' finns inte i datan.")
