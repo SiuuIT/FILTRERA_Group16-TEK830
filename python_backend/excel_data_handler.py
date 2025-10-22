@@ -54,23 +54,22 @@ def apply_filters(df, filters: dict, threshold: int = 60, limit: int = 100):
         normalized_value = normalize_input(value)
         filtered_df = fuzzy_filter(filtered_df, column_lower, normalized_value, threshold)
 
-    accident_cols = [c for c in filtered_df.columns if "accident" in c]
-    incident_cols = [c for c in filtered_df.columns if "incident" in c]
-
+    # --- Modified Section: Aggregate accidents and incidents based on 'category' column values ---
     accident_sum = 0
     incident_sum = 0
 
-    for col in accident_cols:
-        if pd.api.types.is_numeric_dtype(filtered_df[col]):
-            accident_sum += filtered_df[col].sum()
-        else:
-            accident_sum += filtered_df[col].notna().sum()
+    if "category" in filtered_df.columns:
+        category_series = filtered_df["category"].astype(str).str.lower().str.strip()
 
-    for col in incident_cols:
-        if pd.api.types.is_numeric_dtype(filtered_df[col]):
-            incident_sum += filtered_df[col].sum()
-        else:
-            incident_sum += filtered_df[col].notna().sum()
+        # Count number of rows with each category
+        accident_sum = (category_series == "accident").sum()
+        incident_sum = (category_series == "incident").sum()
+
+        # If there is a numeric 'value' column, sum its values instead of counting rows
+        if "value" in filtered_df.columns:
+            accident_sum = filtered_df.loc[category_series == "accident", "value"].sum()
+            incident_sum = filtered_df.loc[category_series == "incident", "value"].sum()
+    # --- End of modified section ---
 
     location_counts = {}
     if "where did it happened" in filtered_df.columns:
