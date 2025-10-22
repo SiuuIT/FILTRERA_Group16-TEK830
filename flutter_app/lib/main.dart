@@ -17,7 +17,6 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   bool showStats = false;
   int refresher = 0;
-  Map<String, dynamic> locationCounts = {};
 
   final ApiService api = ApiService('http://127.0.0.1:8000');
 
@@ -26,10 +25,11 @@ class _MyHomePageState extends State<MyHomePage> {
   String? selectedFactory;
   String? selectedCategory;
 
-  Map<String, dynamic> aggregates = {}; // Store aggregates from backend
+  Map<String, dynamic> aggregates = {};
   Map<String, dynamic>? aiAnswer;
+  Map<String, dynamic> locationCounts = {};
+  List<Map<String, dynamic>> reports = [];
 
-  // Text controllers for manual date input
   final TextEditingController fromDateController = TextEditingController();
   final TextEditingController toDateController = TextEditingController();
 
@@ -44,7 +44,7 @@ class _MyHomePageState extends State<MyHomePage> {
     try {
       final data = await api.getUniqueValues('Factory');
       setState(() {
-        factories = data;
+        factories = List<String>.from(data);
         if (factories.isNotEmpty) {
           selectedFactory = factories.first;
         }
@@ -58,7 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
     try {
       final data = await api.getUniqueValues('Category');
       setState(() {
-        categories = data;
+        categories = List<String>.from(data);
         if (categories.isNotEmpty) {
           selectedCategory = categories.first;
         }
@@ -88,8 +88,6 @@ class _MyHomePageState extends State<MyHomePage> {
     if (selectedCategory != null && selectedCategory!.isNotEmpty) {
       filters['Category'] = selectedCategory!;
     }
-
-    // Include manually typed date filters
     if (fromDateController.text.isNotEmpty || toDateController.text.isNotEmpty) {
       filters['Date'] = {
         if (fromDateController.text.isNotEmpty) 'from': fromDateController.text,
@@ -97,32 +95,21 @@ class _MyHomePageState extends State<MyHomePage> {
       };
     }
 
-    if (filters.isEmpty) {
-      debugPrint('No filters selected.');
-      return;
-    }
-
     try {
-      final response = await api.filterData(
-        filters: filters,
-        limit: 50,
-        threshold: 70,
-      );
+      final response = await api.filterData(filters: filters, limit: 50, threshold: 70);
+
+      final rawAI = response['AIAnswer'];
+      final rawReports = response['accident_reports'] ?? response['reports'];
 
       setState(() {
         aggregates = Map<String, dynamic>.from(response['aggregates'] ?? {});
-        final rawAI = response['AIAnswer'];
+        aiAnswer = (rawAI is Map<String, dynamic>) ? rawAI : (rawAI == null ? null : {'summary': rawAI.toString()});
         locationCounts = Map<String, dynamic>.from(response['location_counts'] ?? {});
-        //print('LocationCounts received: ${widget.locationCounts}');
-
-        if (rawAI is Map<String, dynamic>) {
-          aiAnswer = rawAI;
-        } else {
-          aiAnswer = {'summary': rawAI.toString()}; // fallback if it's plain text
-        }
+        reports = (rawReports is List)
+            ? rawReports.map<Map<String, dynamic>>((e) => Map<String, dynamic>.from(e as Map)).toList()
+            : <Map<String, dynamic>>[];
       });
 
-  
       debugPrint('Aggregates: $aggregates');
     } catch (e) {
       debugPrint('Error applying filters: $e');
@@ -169,14 +156,13 @@ class _MyHomePageState extends State<MyHomePage> {
                               children: [
                                 CustomDropdown(
                                   label: "Factory",
-                                  items:[ 'IKEA Kazlu Ruda' ],
+                                  items: factories,
                                   initialValue: selectedFactory,
                                   onChanged: (value) {
-                                    setState(() => selectedFactory = "IKEA Kazlu Ruda");
+                                    setState(() => selectedFactory = value);
                                   },
                                 ),
                                 const SizedBox(height: 12),
-                                // Manual date range input fields
                                 TextField(
                                   controller: fromDateController,
                                   decoration: const InputDecoration(
@@ -206,13 +192,9 @@ class _MyHomePageState extends State<MyHomePage> {
                               backgroundColor: Colors.black,
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                             ),
-                            child: Text(
-                              showStats ? 'Refresh Statistics Area' : 'Load Statistics Area',
-                            ),
+                            child: Text(showStats ? 'Refresh Statistics Area' : 'Load Statistics Area'),
                           ),
                         ],
                       ),
@@ -224,9 +206,7 @@ class _MyHomePageState extends State<MyHomePage> {
             Expanded(
               flex: 4,
               child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade300, width: 1),
-                ),
+                decoration: BoxDecoration(border: Border.all(color: Colors.grey.shade300, width: 1)),
                 padding: const EdgeInsets.all(8.0),
                 margin: const EdgeInsets.all(8.0),
                 width: double.infinity,
@@ -238,7 +218,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           aggregates: aggregates,
                           aiAnswer: aiAnswer,
                           locationCounts: locationCounts,
-                          )
+                          reports: reports, // <-- pass dynamic reports (where/what/category)
+                        )
                       : const Text('Main Area'),
                 ),
               ),

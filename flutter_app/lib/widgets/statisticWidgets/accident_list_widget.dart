@@ -1,39 +1,46 @@
+// statisticWidgets/accident_list_widget.dart
 import 'package:flutter/material.dart';
 
 class RecentAccidentsList extends StatefulWidget {
-  final List<Map<String, String>> allAccidents;
+  // expects a list of maps: [{where, what, category}]
+  final List<Map<String, dynamic>> reports;
 
-  const RecentAccidentsList({super.key, required this.allAccidents});
+  const RecentAccidentsList({super.key, required this.reports});
 
   @override
   State<RecentAccidentsList> createState() => _RecentAccidentsListState();
 }
 
 class _RecentAccidentsListState extends State<RecentAccidentsList> {
-  late List<Map<String, String>> visibleAccidents;
-  String? selectedSeverity;
+  late List<Map<String, dynamic>> visible;
+  String? selectedCategory; // null | 'accident' | 'incident'
 
   @override
   void initState() {
     super.initState();
-    // Start with showing all
-    visibleAccidents = widget.allAccidents;
+    visible = List<Map<String, dynamic>>.from(widget.reports);
   }
 
-  void _filterBySeverity(String? severity) {
-    setState(() {
-      selectedSeverity = severity;
+  @override
+  void didUpdateWidget(covariant RecentAccidentsList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!identical(oldWidget.reports, widget.reports)) {
+      // refresh visible list when new data arrives
+      _applyFilter(selectedCategory);
+    }
+  }
 
-      if (severity == null) {
-        // Show all
-        visibleAccidents = widget.allAccidents;
-      } else {
-        // Filter accidents dynamically
-        visibleAccidents = widget.allAccidents
-            .where((a) => a['severity']?.toLowerCase() == severity)
-            .toList();
-      }
-    });
+  void _applyFilter(String? category) {
+    selectedCategory = category;
+    if (category == null) {
+      visible = List<Map<String, dynamic>>.from(widget.reports);
+    } else {
+      visible = widget.reports
+          .where((m) =>
+              (m['category']?.toString().toLowerCase().trim() ?? '') == category)
+          .toList();
+    }
+    setState(() {});
   }
 
   @override
@@ -41,58 +48,58 @@ class _RecentAccidentsListState extends State<RecentAccidentsList> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        //  Simple dropdown for filtering
         DropdownButton<String?>(
-          value: selectedSeverity,
-          hint: const Text('Filter by severity'),
+          value: selectedCategory,
+          hint: const Text('All'),
           items: const [
-            DropdownMenuItem(value: null, child: Text('All')),
-            DropdownMenuItem(value: 'high', child: Text('High')),
-            DropdownMenuItem(value: 'medium', child: Text('Medium')),
-            DropdownMenuItem(value: 'low', child: Text('Low')),
+            DropdownMenuItem<String?>(value: null, child: Text('All')),
+            DropdownMenuItem<String?>(value: 'accident', child: Text('Accident')),
+            DropdownMenuItem<String?>(value: 'incident', child: Text('Incident')),
           ],
-          onChanged: _filterBySeverity,
+          onChanged: _applyFilter,
         ),
-
         const SizedBox(height: 8),
-
-        // The scrollable list
         Container(
           height: 250,
           decoration: BoxDecoration(
             border: Border.all(color: Colors.grey.shade300),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: ListView.builder(
-            itemCount: visibleAccidents.length,
-            itemBuilder: (context, index) {
-              final accident = visibleAccidents[index];
-              return ListTile( //list tile is a prebuilt widget each item 
-                title: Text(accident['location'] ?? ''), //?? ''means if null show empty string
-                subtitle: Text(accident['type'] ?? ''),
-                trailing: Chip( // trailing is the thing on the right side 
-                  label: Text(
-                    (accident['severity'] ?? '').toUpperCase(),
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                  backgroundColor: _severityColor(accident['severity']),
+          child: visible.isEmpty
+              ? const Center(child: Text('No reports to show'))
+              : ListView.builder(
+                  itemCount: visible.length,
+                  itemBuilder: (context, index) {
+                    final r = visible[index];
+                    final where = (r['where'] ?? '').toString();
+                    final what = (r['what'] ?? '').toString();
+                    final category =
+                        (r['category'] ?? '').toString().toLowerCase().trim();
+
+                    return ListTile(
+                      title: Text(where),
+                      subtitle: Text(what),
+                      trailing: Chip(
+                        label: Text(
+                          category.isEmpty ? 'N/A' : category.toUpperCase(),
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                        backgroundColor: _categoryColor(category),
+                      ),
+                    );
+                  },
                 ),
-              );
-            },
-          ),
         ),
       ],
     );
   }
 
-  Color _severityColor(String? level) {
-    switch (level?.toLowerCase()) {
-      case 'high':
-        return Colors.red.shade400;
-      case 'medium':
-        return Colors.orange.shade400;
-      case 'low':
-        return Colors.green.shade400;
+  Color _categoryColor(String category) {
+    switch (category) {
+      case 'accident':
+        return Colors.red.shade500;     // red for accident
+      case 'incident':
+        return Colors.green.shade500;   // green for incident
       default:
         return Colors.grey.shade400;
     }
