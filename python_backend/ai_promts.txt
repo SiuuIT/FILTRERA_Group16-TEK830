@@ -1,0 +1,7 @@
+"""
+Här är statistik över incidenter och near misses:
+{summary}
+
+Analysera sambanden. Identifiera möjliga orsaker, riskområden,
+och ge rekommendationer för säkerhetsarbete.
+"""

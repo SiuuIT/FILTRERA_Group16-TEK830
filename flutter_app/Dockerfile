@@ -1,12 +1,9 @@
-FROM ghcr.io/cirruslabs/flutter:3.35.6 AS build
+FROM ghcr.io/cirruslabs/flutter:3.24.0
+
 WORKDIR /app
-
-COPY . .
-
-RUN flutter clean
+COPY flutter_app .
 
 RUN flutter pub get
-
 RUN flutter build web
 
 FROM nginx:stable-alpine

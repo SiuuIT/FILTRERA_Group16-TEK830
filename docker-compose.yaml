@@ -1,3 +1,4 @@
+version: "3.8"
 
 services:
   backend:
@@ -8,9 +9,7 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
     volumes:
-      - ./python_backend:/app  
-      - ./python_backend/data_from_ikea:/app/data_from_ikea
-
+      - ./python_backend:/app  # Optional for live reload in dev
 
   frontend:
     build: ./flutter_app
@@ -19,4 +18,3 @@ services:
       - "8080:80"
     depends_on:
       - backend
-
