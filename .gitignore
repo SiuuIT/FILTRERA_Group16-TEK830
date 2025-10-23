@@ -1,0 +1,5 @@
+python_backend/ai_promts.txt
+python_backend/data_from_ikea/FY20.xlsx
+python_backend/__pycache__/ai_analysis.cpython-314.pyc
+python_backend/__pycache__/api_handler.cpython-314.pyc
+python_backend/__pycache__/excel_data_handler.cpython-314.pyc

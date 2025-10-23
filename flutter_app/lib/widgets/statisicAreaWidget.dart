@@ -1,89 +1,159 @@
+// statistics_area_widget.dart
 import 'package:flutter/material.dart';
 import 'statisticWidgets/accident_list_widget.dart';
 import 'statisticWidgets/accidents_report_card.dart';
 import 'statisticWidgets/heatMapWidgets/factory_heatmap_mvp.dart';
-//this is the usable widget
-class StatisticsAreaWidget extends StatefulWidget{
-  const StatisticsAreaWidget({super.key});
+
+String _norm(String s) => s.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '');
+
+int _coerceToInt(dynamic v) {
+  if (v is int) return v;
+  if (v is num) return v.toInt();
+  if (v is String) return int.tryParse(v) ?? 0;
+  return 0;
+}
+
+int _readIntFromAggregates(
+  Map<String, dynamic> aggregates,
+  List<String> candidateKeys,
+) {
+  if (aggregates.isEmpty) return 0;
+  final normToKey = {for (final k in aggregates.keys) _norm(k): k};
+  for (final cand in candidateKeys) {
+    final hit = normToKey[_norm(cand)];
+    if (hit != null) return _coerceToInt(aggregates[hit]);
+  }
+  for (final value in aggregates.values) {
+    if (value is Map) {
+      final nested = Map<String, dynamic>.from(value as Map);
+      final nestedNorm = {for (final k in nested.keys) _norm(k.toString()): k.toString()};
+      for (final cand in candidateKeys) {
+        final hit = nestedNorm[_norm(cand)];
+        if (hit != null) return _coerceToInt(nested[hit]);
+      }
+    }
+  }
+  return 0;
+}
+
+class StatisticsAreaWidget extends StatefulWidget {
+  final Map<String, dynamic> aggregates;
+  final Map<String, dynamic>? aiAnswer;
+  final Map<String, dynamic>? locationCounts;
+  final List<Map<String, dynamic>> reports; // expects [{where, what, category, ...}]
+  final int accidentsCount;
+  final int incidentsCount;
+
+  StatisticsAreaWidget({
+    Key? key,
+    required Map<String, dynamic> aggregates,
+    required this.aiAnswer,
+    this.locationCounts,
+    required this.reports,
+    String? accidentsKey,
+    String? incidentsKey,
+  })  : aggregates = aggregates,
+        accidentsCount = _readIntFromAggregates(
+          aggregates,
+          [
+            if (accidentsKey != null) accidentsKey,
+            'total_accidents',
+            'accidents_total',
+            'accident_total',
+            'accidents',
+            'totalAccidents',
+          ],
+        ),
+        incidentsCount = _readIntFromAggregates(
+          aggregates,
+          [
+            if (incidentsKey != null) incidentsKey,
+            'total_incidents',
+            'incidents_total',
+            'incident_total',
+            'incidents',
+            'totalIncidents',
+          ],
+        ),
+        super(key: key);
+
   @override
   State<StatisticsAreaWidget> createState() => _StatisticsAreaWidgetState();
-
 }
 
-class _StatisticsAreaWidgetState extends State<StatisticsAreaWidget>{
-  bool showStats = false; 
+class _StatisticsAreaWidgetState extends State<StatisticsAreaWidget> {
+  bool showStats = false;
   int counter = 0;
-  final List<Map<String, String>> allAccidents = [
-    {'location': 'Assembly Line 1', 'type': 'Repetitive strain injury', 'severity': 'low'},
-    {'location': 'Warehouse', 'type': 'Falling object injury', 'severity': 'high'},
-    {'location': 'Loading Dock', 'type': 'Slip and fall', 'severity': 'medium'},
-    {'location': 'Packaging Area', 'type': 'Cut injury', 'severity': 'low'},
-    {'location': 'Maintenance', 'type': 'Burn injury', 'severity': 'high'},
-  ];
-  // toggles between beeing loaded and not loaded
+
   @override
-  void initState(){
+  void initState() {
     super.initState();
-    showStats = true; 
+    showStats = true;
     counter++;
   }
-  
-@override
-Widget build(BuildContext context) {
-  return ListView(
-    padding: const EdgeInsets.all(8.0),
-    children: [
-      //  Heatmap section
-      Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 6,
-              offset: const Offset(0, 2),
+
+  @override
+  Widget build(BuildContext context) {
+    final aiData = widget.aiAnswer ?? {};
+    final locationCounts = widget.locationCounts ?? {};
+
+    return ListView(
+      padding: const EdgeInsets.all(8.0),
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 6, offset: const Offset(0, 2))],
+          ),
+          padding: const EdgeInsets.all(8),
+          child: const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text(
+              "Factory Heatmap",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-          ],
+          ),
         ),
-        padding: const EdgeInsets.all(8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Text(
-                "Factory Heatmap",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+        FactoryHeatmapMVP(locationCounts: locationCounts),
+
+        const SizedBox(height: 16),
+
+        const Text(
+          "AI Safety Summary by Location",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+
+        if (aiData.isNotEmpty)
+          ...aiData.entries.map(
+            (entry) => Card(
+              margin: const EdgeInsets.symmetric(vertical: 4),
+              child: ListTile(
+                leading: const Icon(Icons.location_on_outlined, color: Colors.blueAccent),
+                title: Text(entry.key, style: const TextStyle(fontWeight: FontWeight.bold)),
+                subtitle: Text(entry.value.toString()),
               ),
             ),
-            FactoryHeatmapMVP(),
-          ],
+          )
+        else
+          const Padding(
+            padding: EdgeInsets.all(12),
+            child: Text("No AI analysis available yet."),
+          ),
+
+        const SizedBox(height: 16),
+
+        // Use dynamic reports from backend instead of hard-coded list
+        RecentAccidentsList(reports: widget.reports),
+
+        SafetyIncidentReportCard(
+          factoryName: "Factory B - South Plant",
+          accidents: widget.accidentsCount,
+          incidents: widget.incidentsCount,
+          generatedDate: DateTime(2025, 10, 7, 12, 51),
         ),
-      ),
-      RecentAccidentsList(allAccidents: allAccidents),
-      SafetyIncidentReportCard(
-        factoryName: "Factory B - South Plant",
-        totalEvents: 3,
-        highSeverity: 1,
-        mediumSeverity: 1,
-        lowSeverity: 1,
-        accidents: 2,
-        incidents: 1,
-        nearMisses: 0,
-        generatedDate: DateTime(2025, 10, 7, 12, 51),
-      ),
-      const SizedBox(height: 16),
-
-      
-
-      const SizedBox(height: 24),
-    ],
-  );
-}
-
-
+      ],
+    );
+  }
 }
