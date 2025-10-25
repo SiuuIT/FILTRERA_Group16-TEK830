@@ -1,9 +1,11 @@
 # FILTRERA
 Sustainable Digitalization in Practice Team 16
 
+jag hade gärna skrivit lite mer här honestly.
+
+The simplest way to test our prototype is with Docker, to avoid installing multiple python packages.
 Instructions
 1. Clone repo
-2. ```docker compose build --no-cache``` in terminal at root of project
-3. ```docker compose up``` 
-4. Backend runs at: http://localhost:8000
+2. ```docker compose up --build``` in terminal at root of project
+3. Backend runs at: http://localhost:8000
    Frontend runs at: http://localhost:8080
