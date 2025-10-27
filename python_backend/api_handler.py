@@ -9,7 +9,7 @@ import pandas as pd
 # api_handler.py
 # Fixed version with CORS, POST /filter, GET /columns, and GET /unique-values.
 #run this by this in terminal 
-# source ../.venv/Scripts/activate
+# source .venv/Scripts/activate
 # uvicorn python_backend.api_handler:app --reload
 #also need to set up api key at start every server startup $env:OPENAI_API_KEY="sk-your-key-here"
 #http://127.0.0.1:8000/docs debug serber with this
