@@ -127,14 +127,46 @@ class _StatisticsAreaWidgetState extends State<StatisticsAreaWidget> {
 
         if (aiData.isNotEmpty)
           ...aiData.entries.map(
-            (entry) => Card(
-              margin: const EdgeInsets.symmetric(vertical: 4),
-              child: ListTile(
-                leading: const Icon(Icons.location_on_outlined, color: Colors.blueAccent),
-                title: Text(entry.key, style: const TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: Text(entry.value.toString()),
-              ),
-            ),
+            (entry) {
+              final location = entry.key;
+              final details = entry.value as Map<String, dynamic>? ?? {};
+              final problem = details['problem'] ?? "No problem data";
+              final actions = details['actions'] ?? "No action suggestions";
+
+              return Card(
+                margin: const EdgeInsets.symmetric(vertical: 4),
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.location_on_outlined, color: Colors.blueAccent),
+                          const SizedBox(width: 8),
+                          Text(
+                            location,
+                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        "Problem:",
+                        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.redAccent),
+                      ),
+                      Text(problem),
+                      const SizedBox(height: 6),
+                      const Text(
+                        "Suggested Actions:",
+                        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green),
+                      ),
+                      Text(actions),
+                    ],
+                  ),
+                ),
+              );
+            },
           )
         else
           const Padding(
@@ -144,7 +176,6 @@ class _StatisticsAreaWidgetState extends State<StatisticsAreaWidget> {
 
         const SizedBox(height: 16),
 
-        // Use dynamic reports from backend instead of hard-coded list
         RecentAccidentsList(reports: widget.reports),
 
         SafetyIncidentReportCard(

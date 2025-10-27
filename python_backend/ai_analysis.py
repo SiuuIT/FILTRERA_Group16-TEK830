@@ -47,17 +47,27 @@ def analyze_location_and_description(descriptions: list[str]) -> str:
         "You are an IKEA workplace safety analyst. Below is a list of short incident reports, "
         "each with a location and what happened. Format:\n"
         "'Location: [area] — Incident: [description]'.\n\n"
-        "Group incidents by location and identify the main recurring issue for each area.\n\n"
-        "Return your result strictly as a valid JSON object where each key is the location "
-        "and each value is a short text description of the main issue. Example:\n\n"
+        "Your task:\n"
+        "1. Group incidents by location.\n"
+        "2. For each location, identify the main recurring safety problem.\n"
+        "3. Suggest one or two short, actionable steps that could be taken to reduce or prevent that problem.\n\n"
+        "Return your response **strictly** as a valid JSON object where each key is the location name and each value "
+        "is an object with two fields: 'problem' and 'actions'. Example:\n\n"
         "{\n"
-        "  \"Glue Kitchen\": \"Unsafe electrical setups\",\n"
-        "  \"Press\": \"Outdated fire signage\"\n"
+        "  \"Glue Kitchen\": {\n"
+        "    \"problem\": \"Unsafe electrical setups and damaged wiring\",\n"
+        "    \"actions\": \"Inspect electrical systems weekly and replace worn cables\"\n"
+        "  },\n"
+        "  \"Press\": {\n"
+        "    \"problem\": \"Outdated fire signage and unclear evacuation routes\",\n"
+        "    \"actions\": \"Update signage and conduct quarterly fire drills\"\n"
+        "  }\n"
         "}\n\n"
         "Do not include explanations, markdown, or any other text — only the JSON object.\n\n"
         "Here are the reports:\n"
         f"{combined}"
     )
+
     
 
     async def _call_openai():
