@@ -4,20 +4,20 @@
 <!-- /*User persona could be more explicit: 
 While the solution shows clear user awareness, 
 the site does not present a detailed persona or story to represent how different IKEA staff roles 
-(for example, maintenance worker, facility engineer) would interact with the system.
+(for example, maintenance worker, facility engineer) would interact with the system. fixat?
 
 Theory of Change could include measurable indicators: 
 The impact logic is conceptually sound but could be enhanced by including metrics
-such as improved air quality levels, energy savings, or productivity gains.
+such as improved air quality levels, energy savings, or productivity gains. behöver fixas.
 
 Limited mention of user validation: 
 The site could further strengthen credibility
-by referencing specific user interviews, pilot testing, or feedback gathered during prototype development.
+by referencing specific user interviews, pilot testing, or feedback gathered during prototype development. typ fixat
 
 Systems integration description: 
 The concept would benefit from clearer articulation of
 how FILTRERA connects with existing IKEA data infrastructures or
-sustainability reporting systems to highlight scalability and systemic impact. */
+sustainability reporting systems to highlight scalability and systemic impact. */ nämna servicenow och power bi
 -->
 
 <head>
@@ -111,7 +111,15 @@ sustainability reporting systems to highlight scalability and systemic impact. *
       </div>
       <div id="prototyp-text">
         <p class="text-bigger">
-          We present our prototype: A smart filtering solution to improve everyday life
+        <p class="text-bigger">
+          Based on user testing and IKEA’s feedback, we refined our prototype to make the heatmap
+          cleaner, more readable, and easier to use. The updated design features clear color
+          coding for severity levels and a more intuitive layout.
+          Users can now click on specific areas to explore incidents and summaries in detail,
+          making it simple for both managers and non-technical staff to understand and act on key insights. jag vill få
+          in det här på nåt sätt. kanske behöver strukturera om lite men det kan vara värt.
+          de två sista bilderna är typ samma eller?
+        </p>
         </p>
       </div>
       <div id="prototyp-image-block">
@@ -137,6 +145,7 @@ sustainability reporting systems to highlight scalability and systemic impact. *
           <p class="text">
             During prototype testing, users wanted a quick way to filter out irrelevant information.
             Therefore, FILTRERA focuses only on the insights that matter from your factory reports.
+            <!--den här sektionen suger just nu-->
           </p>
         </div>
         <div class="fact-item">
@@ -146,6 +155,7 @@ sustainability reporting systems to highlight scalability and systemic impact. *
           <p class="text">
             Users responded positively to seeing report statistics visualized, that's why
             FILTRERA lets you visualize filtered data for clear, actionable understanding.
+            <!-- förklara lite mer hur den gör det-->
           </p>
         </div>
         <div class="fact-item">
@@ -154,8 +164,10 @@ sustainability reporting systems to highlight scalability and systemic impact. *
           </p>
           <p class="text">
             Based on user feedback during prototype stage, a clear need for more detailed
-            statistics was identified. FILTRERA makes it easy to gain precise metrics that 
-            support and enrich your heatmap view.
+            statistics was identified. FILTRERA provides AI-generated summaries and weighted metrics that support and
+            enrich your heatmap view,
+            giving both an overview and in-depth insight into safety performance.
+            <!-- återigen asså vi borde förklara lite. edit: bättre förklaring nu?-->
           </p>
         </div>
         <div class="fact-item">
@@ -166,6 +178,7 @@ sustainability reporting systems to highlight scalability and systemic impact. *
             During interviews with managers, we received feedback on the importance
             of simplicity and ease of action. Therefore FILTRERA offers a clean
             and intuitive interface.
+            <!-- den är nice men borde renskrivas. therefore låter sus-->
           </p>
         </div>
         <div class="fact-item">
@@ -173,27 +186,27 @@ sustainability reporting systems to highlight scalability and systemic impact. *
             📥 Seamless export
           </p>
           <p class="text">
-            Manager interviews highlighted the importance of quick access to insight. FILTRERA
+            Manager interviews also highlighted the importance of quick access to insight. FILTRERA
             allows users to download tailored reports as PDF for easy sharing and documentation.
+            <!-- också ba formulera bättre-->
           </p>
         </div>
       </div>
       <div id="demo-presentation-block">
         <div class="demo-presentation-item">
           <p class="text bold">
-           Final Pitch coming soon
+            Final Pitch coming soon
           </p>
-          <iframe width="550" height="350" src="" title="YouTube video player"
-            frameborder="0"
+          <iframe width="550" height="350" src="" title="YouTube video player" frameborder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowfullscreen style="box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.8); border-radius: 20px;"></iframe>
         </div>
         <div class="demo-presentation-item">
           <p class="text bold">
             Demo of our finished product coming soon
+            <!-- kan inkludera text om ett särksilt exempel.-->
           </p>
-          <iframe width="550" height="350" src="" title="YouTube video player"
-            frameborder="0"
+          <iframe width="550" height="350" src="" title="YouTube video player" frameborder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowfullscreen style="box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.8); border-radius: 20px;"></iframe>
         </div>
@@ -213,9 +226,11 @@ sustainability reporting systems to highlight scalability and systemic impact. *
             Usability:
           </p>
           <p>
-            FILTRERA is designed for safety managers and supervisors within IKEA’s operations. These users need a simple and 
-            effective way to view and analyze safety incidents and risks in daily tasks. By enabling clear visualization 
-            of safety data, improvement areas can be identified quickly to support better decision-making and prevent accidents.
+            FILTRERA is designed for safety managers and supervisors within IKEA’s operations. These users need a simple
+            and
+            effective way to view and analyze safety incidents and risks in daily tasks. By enabling clear visualization
+            of safety data, improvement areas can be identified quickly to support better decision-making and prevent
+            accidents.
           </p>
         </div>
         <div class="bility">
@@ -223,10 +238,10 @@ sustainability reporting systems to highlight scalability and systemic impact. *
             Feasibility:
           </p>
           <p>
-            FILTRERA is an app developed in Flutter, with the help of a Python filtering backend. 
+            FILTRERA is an app developed in Flutter, with the help of a Python filtering backend.
             It utilizes existing data from IKEA’s safety reports, making it feasible to implement without requiring new
             data collection processes. This allows for quick deployment and integration into IKEA's current workflows.
-             <!--här borde vi skriva mer om deras servicenow system och hur vi kan integrera med det.-->
+            <!--här borde vi skriva mer om deras servicenow system och hur vi kan integrera med det.-->
           </p>
         </div>
         <div class="bility">
@@ -234,8 +249,9 @@ sustainability reporting systems to highlight scalability and systemic impact. *
             Viability:
           </p>
           <p>
-            FILTRERA aligns closely with IKEA’s focus on employee safety, continuous improvement, and data-driven decision-making. 
-            It supports IKEA’s core values of creating a safe and sustainable work environment. 
+            FILTRERA aligns closely with IKEA’s focus on employee safety, continuous improvement, and data-driven
+            decision-making.
+            It supports IKEA’s core values of creating a safe and sustainable work environment.
             <!--vi borde skriva mer här-->
           </p>
         </div>
@@ -244,9 +260,11 @@ sustainability reporting systems to highlight scalability and systemic impact. *
             Sustainability:
           </p>
           <p>
-            By enabling faster identification and resolution of safety risks, FILTRERA helps reduce workplace accidents. 
-            This minimizes sick leaves and costs, while increasing employee satisfaction and productivity. We have also considered potential risks such as exclusion of non-technical users, 
-            and misinterpretation of collected data—and we are actively working to design an inclusive, secure, and user-friendly interface.
+            By enabling faster identification and resolution of safety risks, FILTRERA helps reduce workplace accidents.
+            This minimizes sick leaves and costs, while increasing employee satisfaction and productivity. We have also
+            considered potential risks such as exclusion of non-technical users,
+            and misinterpretation of collected data—and we are actively working to design an inclusive, secure, and
+            user-friendly interface.
           </p>
         </div>
       </div>
@@ -272,29 +290,35 @@ sustainability reporting systems to highlight scalability and systemic impact. *
             </p>
           </div>
           <div class="AI-points">
-            <p class="text bold">
-              📝Content Summary
-            </p>
+            <p class="text bold">🧾 Smart Data Understanding</p>
             <p class="text">
-              AI helps us summarize lengthy reports into concise key points for easier analysis.
-              <!--kanske prata lite mer här. tycker den här sektionen borde vara mer om
-              hur ai används i projektet snarare än hur vi fick hjälp med grammatiken liksom.-->
+              FILTRERA’s AI analyzes both structured fields (such as date, location, and type of incident)
+              and unstructured free text from safety reports.
+              It aggregates information by <strong>location and severity</strong> to highlight patterns and trends.
             </p>
           </div>
           <div class="AI-points">
-            <p class="text bold">
-              💻 Simplified filtering
-            </p>
+            <p class="text bold">📊 Severity Weighting</p>
             <p class="text">
-              By conversating with AI, you can easily see exactly what you are looking for in large datasets.
+              Each incident is scored by severity level — for example, “minor,” “moderate,” or “critical.”
+              The heatmap scales its color intensity based on these weights, allowing users to distinguish
+              between frequent but low-impact events and rare but severe incidents.
             </p>
           </div>
           <div class="AI-points">
-            <p class="text bold">
-              🚀Delivering insights
-            </p>
+            <p class="text bold">📝 Summarization & Insights</p>
             <p class="text">
-              By analzying patterns in the data, AI can help identify trends and potential risks to help solve the problems at hand.
+              AI automatically summarizes multiple incident reports into key points, combining both structured
+              and free-text data. This makes it easier to understand root causes and recurring trends without reading
+              every report individually.
+            </p>
+          </div>
+          <div class="AI-points">
+            <p class="text bold">🔔 Proactive Alerts (Next Step)</p>
+            <p class="text">
+              A future development direction is an AI assistant that could notify users when certain patterns rise.
+              For example, a sudden increase in injuries in a specific zone. This supports proactive data-driven safety
+              management
             </p>
           </div>
         </div>
@@ -308,7 +332,6 @@ sustainability reporting systems to highlight scalability and systemic impact. *
           About The Team - Group 16
         </p>
       </div>
-
       <div id="among-us-content">
         <div id="among-us-left">
           <img src="src/resources/boyzen/chalmerzz.png" alt="Chalmers">
@@ -412,17 +435,17 @@ sustainability reporting systems to highlight scalability and systemic impact. *
   <!-- mark header links-->
 
   <script>
-    
+
     const words = ["faster decision-making!", "accurate conclusions!", "efficiency and clarity!", "data-driven culture!"];
     let index = 0;
     const wordElement = document.getElementById('introduction-word-change');
 
     setInterval(() => {
-    wordElement.style.opacity = 0;
-    setTimeout(() => {
-      index = (index + 1) % words.length;
-      wordElement.textContent = words[index];
-      wordElement.style.opacity = 1;
+      wordElement.style.opacity = 0;
+      setTimeout(() => {
+        index = (index + 1) % words.length;
+        wordElement.textContent = words[index];
+        wordElement.style.opacity = 1;
       }, 500);
     }, 3000);
 
@@ -436,7 +459,7 @@ sustainability reporting systems to highlight scalability and systemic impact. *
         const topSection = section.offsetTop;
         const heightSection = section.offsetHeight;
 
-        if (window.scrollY >= topSection - (heightSection / 2.5)){
+        if (window.scrollY >= topSection - (heightSection / 2.5)) {
           currentSection = section.id
         }
       })
@@ -444,7 +467,7 @@ sustainability reporting systems to highlight scalability and systemic impact. *
       headerLinks.forEach(link => {
         link.classList.remove("active");
 
-        if(link.getAttribute("href") === "#" + currentSection) {
+        if (link.getAttribute("href") === "#" + currentSection) {
           link.classList.add("active")
         }
       })
@@ -453,4 +476,5 @@ sustainability reporting systems to highlight scalability and systemic impact. *
   </script>
 
 </body>
+
 </html>
