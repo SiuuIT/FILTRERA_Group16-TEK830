@@ -162,27 +162,45 @@ nav a.active {
 
 /* ----------- INTRODUCTION SECTION ------------ */
 #introduction-section {
-  background-image: url("resources/gustav-wilhelm-bilder/data-analyst-background (1).jpg");
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#top-background, #bottom-background {
+  width: 100%;
+  aspect-ratio: 20 / 3;
+  background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  background-size: 100% 600px;
-  
+}
+
+#top-background {
+  background-image: url("/src/resources/gustav-wilhelm-bilder/Upper-background-image.png");
+}
+
+#bottom-background {
+  background-image: url("/src/resources/gustav-wilhelm-bilder/down-background-image.png");
+}
+
+#introduction-content{
   display: flex;
   flex-direction: row;
   align-items: center;
   text-align: center;
   justify-content: center;
+  max-width: 1400px;
+  margin: 100px;
   gap: 200px;
-  height: 80vh;
-  width: 100%;
 }
-
 
 #introduction-text-block {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
+  width: clamp(300px, 60vw, 800px);
 }
 
 #introduction-text {
@@ -197,6 +215,23 @@ nav a.active {
 #introduction-word-change {
   color: var(--color-ikea-blue);
   transition: opacity 0.5s ease-in-out;
+}
+
+@media (max-width: 1400px) {
+  #top-background, #bottom-background {
+    width: 100%;
+    height: auto;
+    min-height: 200px;
+    max-height: 800px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+}
+@media (max-width: 1100px) {
+  #introduction-image-block {
+    display: none;
+  }
 }
 
 /* ------------- Prototyp -------------- */
@@ -221,7 +256,8 @@ nav a.active {
 }
 
 .prototyp-image {
-  width: 700px;
+  width: clamp(200px, 40vw, 700px);
+  height: auto;
   box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.8);
   border-radius: 20px;
 }
@@ -232,6 +268,7 @@ nav a.active {
   flex-direction: row;
   align-items: center;
   justify-content: center;
+  flex-wrap: wrap;
   gap: 200px;
 }
 
@@ -252,7 +289,7 @@ nav a.active {
 }
 
 #demo-presentation-block{
-  display: flex; 
+  display: flex;
   flex-direction: column;
 }
 
