@@ -59,10 +59,10 @@ def filter_data(request: FilterRequest):
         clean_response = {
             "aggregates": result["aggregates"],
             "location_counts": result["location_counts"],
-            "AI_summary": ai_summary,
+            "AIAnswer": ai_summary,
             "accident_reports": merged_reports[:20],  # limit to top N if desired
         }
-
+        print(clean_response)
         return clean_response
 
     except ValueError as e:
