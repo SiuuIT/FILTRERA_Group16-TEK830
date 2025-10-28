@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from excel_data_handler import load_excel, apply_filters
-from ai_analysis import analyze_location_and_description
+from ai_analysis import analyze_location_and_description,  rank_incident_severity 
 import logging
 import pandas as pd
 # api_handler.py
@@ -32,21 +32,34 @@ class FilterRequest(BaseModel):
     threshold: int = 60
 
 
+# --- Routes ---
 @app.post("/filter")
 def filter_data(request: FilterRequest):
-    """Filter Excel data, count accidents/incidents, and run AI summary."""
+    """Filter Excel data, count accidents/incidents, and run AI summaries."""
     if df is None:
         return JSONResponse(status_code=500, content={"error": "Excel-data kunde inte laddas."})
 
     try:
+        # Filter the Excel data
         result = apply_filters(df, request.filters, request.threshold, request.limit)
 
-        # Add AI-generated safety summary
+        # --- AI Analysis ---
+        # 1 Generate summary (problems + actions per location)
         ai_summary = analyze_location_and_description(result.get("descriptions", []))
         print("AI Summary:", ai_summary)  # Debug print
-        result["AIAnswer"] = ai_summary
-        del result["descriptions"]  # remove raw descriptions from output
 
+        # 2 Generate severity rankings for each report
+        severity_rankings = rank_incident_severity(result.get("accident_reports", []))
+        
+
+        # --- Build response ---
+        result["AIAnswer"] = ai_summary
+        result["severity_rankings"] = severity_rankings
+
+        # Cleanup raw data before returning
+        if "descriptions" in result:
+            del result["descriptions"]
+                        
         return result
 
     except ValueError as e:
@@ -55,6 +68,7 @@ def filter_data(request: FilterRequest):
     except Exception as e:
         logging.exception("Unknown error")
         return JSONResponse(status_code=500, content={"error": str(e)})
+
 
 
 @app.get("/columns")

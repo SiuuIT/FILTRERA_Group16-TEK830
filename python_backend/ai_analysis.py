@@ -4,7 +4,6 @@ import asyncio
 import json
 
 def analyze_descriptions(descriptions: list[str]) -> str:
-    """Analyze and summarize incident descriptions using OpenAI (thread-safe for FastAPI)."""
     if not descriptions:
         return "No descriptions available for analysis."
 
@@ -29,15 +28,14 @@ def analyze_descriptions(descriptions: list[str]) -> str:
         return response.choices[0].message.content.strip()
 
     try:
-        # Run safely even if called from a sync FastAPI route
         return asyncio.run(_call_openai())
     except Exception as e:
         return f"AI analysis failed: {e}"
 
 
-
-def analyze_location_and_description(descriptions: list[str]) -> str:
-    """Analyze and summarize incident descriptions using OpenAI (thread-safe for FastAPI)."""
+#  FIXED — added return logic
+def analyze_location_and_description(descriptions: list[str]):
+    """Analyze and summarize incident descriptions by location using OpenAI."""
     if not descriptions:
         return "No descriptions available for analysis."
 
@@ -51,7 +49,7 @@ def analyze_location_and_description(descriptions: list[str]) -> str:
         "1. Group incidents by location.\n"
         "2. For each location, identify the main recurring safety problem.\n"
         "3. Suggest one or two short, actionable steps that could be taken to reduce or prevent that problem.\n\n"
-        "Return your response **strictly** as a valid JSON object where each key is the location name and each value "
+        "Return your response strictly as a valid JSON object where each key is the location name and each value "
         "is an object with two fields: 'problem' and 'actions'. Example:\n\n"
         "{\n"
         "  \"Glue Kitchen\": {\n"
@@ -68,7 +66,57 @@ def analyze_location_and_description(descriptions: list[str]) -> str:
         f"{combined}"
     )
 
-    
+    async def _call_openai():
+        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        response = await asyncio.to_thread(
+            client.chat.completions.create,
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.5,
+        )
+        return response.choices[0].message.content.strip()
+
+    try:
+        raw_response = asyncio.run(_call_openai())
+
+        try:
+            parsed = json.loads(raw_response)
+            return parsed
+        except json.JSONDecodeError:
+            return {"error": "Failed to parse AI JSON", "raw": raw_response}
+
+    except Exception as e:
+        return {"error": f"AI analysis failed: {e}"}
+
+
+def rank_incident_severity(accident_reports: list[dict]) -> list[dict]:
+    if not accident_reports:
+        return []
+
+    combined = "\n".join([
+        f"Location: {r.get('where')} — Incident: {r.get('what')} — Category: {r.get('category')}"
+        for r in accident_reports[:50]
+    ])
+
+    prompt = (
+        "You are an IKEA workplace safety assessor. Below are short incident reports, "
+        "each with a location, description, and category (accident or incident).\n\n"
+        "For each, assign a SEVERITY score between 1 and 10 based on risk, potential harm, "
+        "and seriousness (1 = trivial, 10 = severe or life-threatening).\n\n"
+        "Return your response strictly as a valid JSON array, each element with:\n"
+        "  - location\n"
+        "  - incident\n"
+        "  - category\n"
+        "  - severity (integer 1–10)\n\n"
+        "Example:\n"
+        "[\n"
+        "  {\"location\": \"Warehouse Zone B\", \"incident\": \"Forklift collision\", \"category\": \"accident\", \"severity\": 8},\n"
+        "  {\"location\": \"Packaging Line\", \"incident\": \"Minor spill\", \"category\": \"incident\", \"severity\": 3}\n"
+        "]\n\n"
+        "Do not include explanations or markdown. Only return valid JSON.\n\n"
+        "Here are the reports:\n"
+        f"{combined}"
+    )
 
     async def _call_openai():
         client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -80,17 +128,13 @@ def analyze_location_and_description(descriptions: list[str]) -> str:
         )
         return response.choices[0].message.content.strip()
 
-
     try:
-        # Run safely even if called from a sync FastAPI route
         raw_response = asyncio.run(_call_openai())
 
-        #  Try to parse JSON safely
         try:
             parsed = json.loads(raw_response)
-            return parsed  # return Python dict if valid JSON
+            return parsed
         except json.JSONDecodeError:
-            # fallback: return raw string if not valid JSON
             return {"error": "Failed to parse AI JSON", "raw": raw_response}
 
     except Exception as e:
