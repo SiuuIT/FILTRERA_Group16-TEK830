@@ -69,7 +69,48 @@ byt all incidents till IA?
             </li>
           </ul>
         </div>
-      </div>
+        <div id="burger-menu-container">
+          <span class="burger-menu-icon" onclick="openbarStart()">
+            &#9776; <!--&#9776 = menu icon  -->
+          </span>
+          <ul class="burger-menu">
+            <li class="link-styling">
+              <a href="javascript:void(0)" class="close-icon" onclick="closebarStart()">
+                &#10005; <!-- &times = cross icon -->
+              </a>
+            </li>
+            <li>
+              <a class="link-styling text" href=#introduction-section>
+                Start
+              </a>
+            </li>
+            <li>
+              <a class="link-styling text" href=#prototyp-section>
+                Prototyp
+              </a>
+            </li>
+            <li>
+              <a class="link-styling text" href="#demo-presentation-section">
+                Presentation / Demo
+              </a>
+            </li>
+            <li>
+              <a class="link-styling text" href="#design-thinking-section">
+                Design Thinking
+              </a>
+            </li>
+            <li>
+              <a class="link-styling text" href="#AI-section">
+                AI Usage
+              </a>
+            </li>
+            <li>
+              <a class="link-styling text" href="#among-us-section">
+                About Us
+              </a>
+            </li>
+          </ul>
+        </div>
       </div>
     </nav>
   </header>
@@ -446,11 +487,8 @@ byt all incidents till IA?
   </footer>
 
   <!-- JAVASCRIPTS -->
-  <!-- change word -->
-  <!-- mark header links-->
-
   <script>
-
+    // Change introduction word
     const words = ["faster decision-making!", "accurate conclusions!", "efficiency and clarity!", "data-driven culture!"];
     let index = 0;
     const wordElement = document.getElementById('introduction-word-change');
@@ -464,6 +502,7 @@ byt all incidents till IA?
       }, 500);
     }, 3000);
 
+    // Highlight active header link on scroll
     window.addEventListener("scroll", () => {
       const sections = document.querySelectorAll("section");
       const headerLinks = document.querySelectorAll("nav a");
@@ -488,8 +527,24 @@ byt all incidents till IA?
       })
 
     })
-  </script>
 
+    // Burger menu open function
+    function openbarStart() {
+      const burgerWidth = document.getElementsByClassName("burger-menu");
+      for(let i = 0; i < burgerWidth.length; i++) {
+        burgerWidth[i].style.width = "160px";
+        }
+    } 
+
+    // Burger menu close function
+    function closebarStart() {
+      const burgerWidth = document.getElementsByClassName("burger-menu");
+      for(let i = 0; i < burgerWidth.length; i++) {
+        burgerWidth[i].style.width = "0px";
+      }
+    }
+
+  </script>
 </body>
 
 </html>

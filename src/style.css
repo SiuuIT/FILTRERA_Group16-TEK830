@@ -1,7 +1,7 @@
 /* --------- STYLING FOR THE ENTIRE PAGE --------- */
 html, body {
-  height: 100%;
   width: 100%;
+  height: auto;
   margin: 0px;
   padding: 0px;
   font-family: 'Arial', sans-serif;
@@ -32,7 +32,7 @@ p {
 }
 
 .subtitle {
-  font-size: clamp(25px, 5vw, 40px);
+  font-size: clamp(25px, 5vw, 50px);
   font-weight: var(--font-weight-bold);
 }
 
@@ -134,7 +134,6 @@ nav a.active {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
   position: fixed;
   top: 0;
   left: 0;
@@ -159,6 +158,70 @@ nav a.active {
 .link-styling {
   margin-right: 40px;
 }
+
+#burger-menu-container{
+  display: none;
+}
+
+.burger-menu-icon{
+  display: none; /* Hides the element from the start */
+}
+
+.burger-menu {
+  display: none;
+}
+
+.close-icon{
+  display: none;
+}
+
+/* -------------- RESPONSIVE @MEDIA -------------- */
+@media (max-width: 1450px) {
+  #link-start {
+    display: none;
+  }
+
+  #burger-menu-container{
+    display: block;
+  }
+
+  .burger-menu-icon {
+    display: block;
+    font-size: 30px;
+    color: var(--color-black);
+    margin: 0 20px 5px 0; /* top, right, bottom, left*/
+    cursor: pointer;
+    transition: 0.5s;
+  }
+  
+  .burger-menu {
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 0;
+    height: 100vh;
+    transition: 0.5s;
+    padding-top: 10px;
+    overflow: hidden;
+    background-color: var(--color-white);
+  }
+
+  .close-icon{
+    position: absolute; 
+    color: var(--color-black);
+    top: 0;
+    right: 20px;
+  }
+
+  .burger-menu a  {
+    margin: 12px 6px 12px 30px;
+    font-size: 16px;
+    display: block;
+    color: var(--color-black);
+  }
+}
+
 
 /* ----------- INTRODUCTION SECTION ------------ */
 #introduction-section {
@@ -190,9 +253,9 @@ nav a.active {
   align-items: center;
   text-align: center;
   justify-content: center;
-  max-width: 1400px;
   margin: 100px;
-  gap: 200px;
+  gap: 300px;
+  background-color: red;
 }
 
 #introduction-text-block {
@@ -200,7 +263,8 @@ nav a.active {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  width: clamp(300px, 60vw, 800px);
+  width: clamp(400px, 100%, 900px);
+  background-color: blue;
 }
 
 #introduction-text {
@@ -208,7 +272,7 @@ nav a.active {
 }
 
 #introduction-image{
-  width: 300px;
+  width: 400px;
   height: auto;
 }
 
@@ -217,7 +281,7 @@ nav a.active {
   transition: opacity 0.5s ease-in-out;
 }
 
-@media (max-width: 1400px) {
+@media (max-width: 1500px) {
   #top-background, #bottom-background {
     width: 100%;
     height: auto;
@@ -227,8 +291,7 @@ nav a.active {
     background-position: center;
     background-repeat: no-repeat;
   }
-}
-@media (max-width: 1100px) {
+  
   #introduction-image-block {
     display: none;
   }
