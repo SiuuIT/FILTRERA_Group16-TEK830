@@ -94,7 +94,7 @@ def rank_incident_severity(accident_reports: list[dict]) -> list[dict]:
         return []
 
     combined = "\n".join([
-        f"Location: {r.get('where')} — Incident: {r.get('what')} — Category: {r.get('category')}"
+        f"where: {r.get('where')} — what: {r.get('what')} — category: {r.get('category')}"
         for r in accident_reports[:50]
     ])
 
@@ -104,14 +104,14 @@ def rank_incident_severity(accident_reports: list[dict]) -> list[dict]:
         "For each, assign a SEVERITY score between 1 and 10 based on risk, potential harm, "
         "and seriousness (1 = trivial, 10 = severe or life-threatening).\n\n"
         "Return your response strictly as a valid JSON array, each element with:\n"
-        "  - location\n"
-        "  - incident\n"
+        "  - where\n"
+        "  - what\n"
         "  - category\n"
         "  - severity (integer 1–10)\n\n"
         "Example:\n"
         "[\n"
-        "  {\"location\": \"Warehouse Zone B\", \"incident\": \"Forklift collision\", \"category\": \"accident\", \"severity\": 8},\n"
-        "  {\"location\": \"Packaging Line\", \"incident\": \"Minor spill\", \"category\": \"incident\", \"severity\": 3}\n"
+        "  {\"where\": \"Warehouse Zone B\", \"what\": \"Forklift collision\", \"category\": \"accident\", \"severity\": 8},\n"
+        "  {\"where\": \"Packaging Line\", \"what\": \"Minor spill\", \"category\": \"incident\", \"severity\": 3}\n"
         "]\n\n"
         "Do not include explanations or markdown. Only return valid JSON.\n\n"
         "Here are the reports:\n"

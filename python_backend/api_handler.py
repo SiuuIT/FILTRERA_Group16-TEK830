@@ -35,32 +35,35 @@ class FilterRequest(BaseModel):
 # --- Routes ---
 @app.post("/filter")
 def filter_data(request: FilterRequest):
-    """Filter Excel data, count accidents/incidents, and run AI summaries."""
     if df is None:
         return JSONResponse(status_code=500, content={"error": "Excel-data kunde inte laddas."})
 
     try:
-        # Filter the Excel data
         result = apply_filters(df, request.filters, request.threshold, request.limit)
 
-        # --- AI Analysis ---
-        # 1 Generate summary (problems + actions per location)
         ai_summary = analyze_location_and_description(result.get("descriptions", []))
-        print("AI Summary:", ai_summary)  # Debug print
-
-        # 2 Generate severity rankings for each report
         severity_rankings = rank_incident_severity(result.get("accident_reports", []))
-        
 
-        # --- Build response ---
-        result["AIAnswer"] = ai_summary
-        result["severity_rankings"] = severity_rankings
+        # Merge accident_reports and severity_rankings into a compact summary
+        merged_reports = []
+        if isinstance(severity_rankings, list):
+            for r in severity_rankings:
+                merged_reports.append({
+                    "where": r.get("where") or r.get("location"),
+                    "what": r.get("what") or r.get("incident"),
+                    "category": r.get("category"),
+                    "severity": r.get("severity")
+                })
 
-        # Cleanup raw data before returning
-        if "descriptions" in result:
-            del result["descriptions"]
-                        
-        return result
+        # Build minimal response
+        clean_response = {
+            "aggregates": result["aggregates"],
+            "location_counts": result["location_counts"],
+            "AI_summary": ai_summary,
+            "accident_reports": merged_reports[:20],  # limit to top N if desired
+        }
+
+        return clean_response
 
     except ValueError as e:
         logging.exception("Filter error")
@@ -68,6 +71,7 @@ def filter_data(request: FilterRequest):
     except Exception as e:
         logging.exception("Unknown error")
         return JSONResponse(status_code=500, content={"error": str(e)})
+
 
 
 
