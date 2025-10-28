@@ -82,20 +82,31 @@ class _RecentAccidentsListState extends State<RecentAccidentsList> {
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Chip(
-                            label: Text(
-                              category.isEmpty ? 'N/A' : category.toUpperCase(),
-                              style: const TextStyle(color: Colors.redAccent),
-                            ),
-                            backgroundColor: _categoryColor(category).withValues(alpha: 0.25),
-                          ),
+                          Builder(builder: (context) {
+                            final color = _categoryColor(category);
+                            return Chip(
+                              label: Text(
+                                category.isEmpty ? 'N/A' : category.toUpperCase(),
+                                style: TextStyle(color: color, fontWeight: FontWeight.bold),
+                              ),
+                              
+                              side: BorderSide(color: color),
+                              
+                              backgroundColor: color.withValues(alpha: 0.15),
+                            );
+                          }),
                           const SizedBox(width: 6),
-                          Chip(
-                            label: Text('Severity: $severity'),
-                            backgroundColor:
-                                _severityColor(int.tryParse(severity) ?? 0),
-                            labelStyle: const TextStyle(color: Colors.white),
-                          ),
+                          Builder(builder: (context) {
+                            final color = _severityColor(int.tryParse(severity) ?? 0);
+                            return Chip(
+                              label: Text(
+                                'Severity: $severity',
+                                style: TextStyle(color: color, fontWeight: FontWeight.bold),
+                              ),
+                              side: BorderSide(color: color),
+                              backgroundColor: color.withValues(alpha: 0.15),
+                            );
+                          }),
                         ],
                       ),
                     );
@@ -109,9 +120,9 @@ class _RecentAccidentsListState extends State<RecentAccidentsList> {
   Color _categoryColor(String category) {
     switch (category) {
       case 'accident':
-        return Colors.red.shade500;
+        return Colors.redAccent;
       case 'incident':
-        return Colors.yellow;
+        return Colors.orangeAccent;
       default:
         return Colors.grey.shade400;
     }
