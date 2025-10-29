@@ -5,13 +5,15 @@ class HeatPoint {
   final String area;
   final double x;
   final double y;
-  final double intensity;
+  final double count;
+  final double severity;
 
   HeatPoint({
     required this.area,
     required this.x,
     required this.y,
-    required this.intensity,
+    required this.count,
+    required this.severity,
   });
 }
 
@@ -24,9 +26,9 @@ class FactoryLayout {
 
 // ------------------ MAIN SCREEN ------------------
 class FactoryHeatmapMVP extends StatelessWidget {
-  final Map<String, dynamic> locationCounts;
+  final Map<String, dynamic> heatmapData;
 
-  const FactoryHeatmapMVP({super.key, required this.locationCounts});
+  const FactoryHeatmapMVP({super.key, required this.heatmapData});
 
   Map<String, Offset> get _locationCoordinates => {
         'Warehouse Zone A': const Offset(0.10, 0.70),
@@ -43,7 +45,7 @@ class FactoryHeatmapMVP extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final points = _generateHeatPoints(locationCounts);
+    final points = _generateHeatPoints(heatmapData);
 
     final factory = FactoryLayout(
       imageAsset: 'assets/images/factory.jpg',
@@ -65,41 +67,63 @@ class FactoryHeatmapMVP extends StatelessWidget {
             maxScale: 4.0,
             child: AspectRatio(
               aspectRatio: 16 / 9,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  Image.asset(factory.imageAsset, fit: BoxFit.contain),
-                  ...factory.points.map((p) {
-                    return Positioned(
-                      left: p.x * MediaQuery.of(context).size.width * 0.9,
-                      top: p.y * MediaQuery.of(context).size.width * 0.5,
-                      child: _HeatPointWidget(point: p),
-                    );
-                  }),
-                ],
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final width = constraints.maxWidth;
+                  final height = constraints.maxHeight;
+
+                  return Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Image.asset(factory.imageAsset, fit: BoxFit.contain),
+                      ...factory.points.map((p) {
+                        return Positioned(
+                          left: p.x * width,
+                          top: p.y * height,
+                          child: _HeatPointWidget(point: p),
+                        );
+                      }),
+                    ],
+                  );
+                },
               ),
             ),
+
           ),
         ),
       ),
     );
   }
 
-  List<HeatPoint> _generateHeatPoints(Map<String, dynamic> counts) {
-    if (counts.isEmpty) return [];
+  List<HeatPoint> _generateHeatPoints(Map<String, dynamic> data) {
+    if (data.isEmpty) return [];
 
-    final maxValue = counts.values
-        .map((e) => e as num)
-        .reduce((a, b) => a > b ? a : b)
-        .toDouble();
+    final maxCount = data.values
+        .map((v) => (v['count'] ?? 0).toDouble())
+        .fold<double>(0, (a, b) => a > b ? a : b);
 
-    return counts.entries.map((entry) {
+    final maxSeverity = data.values
+        .map((v) => (v['avg_severity'] ?? 0).toDouble())
+        .fold<double>(0, (a, b) => a > b ? a : b);
+
+    return data.entries.map((entry) {
       final area = entry.key;
-      final count = (entry.value as num).toDouble();
-      final normalized = (count / maxValue).clamp(0.0, 1.0);
+      final value = entry.value as Map<String, dynamic>;
+      final count = (value['count'] ?? 0).toDouble();
+      final avgSeverity = (value['avg_severity'] ?? 0).toDouble();
       final pos = _locationCoordinates[area];
       if (pos == null) return null;
-      return HeatPoint(area: area, x: pos.dx, y: pos.dy, intensity: normalized);
+
+      final normalizedSeverity =
+          maxSeverity == 0 ? 0.0 : (avgSeverity / maxSeverity).clamp(0.0, 1.0);
+
+      return HeatPoint(
+        area: area,
+        x: pos.dx,
+        y: pos.dy,
+        count: count,
+        severity: normalizedSeverity,
+      );
     }).whereType<HeatPoint>().toList();
   }
 }
@@ -120,7 +144,7 @@ class _HeatPointWidgetState extends State<_HeatPointWidget> {
   Color get _baseColor => HSVColor.lerp(
         HSVColor.fromColor(Colors.green),
         HSVColor.fromColor(Colors.red),
-        widget.point.intensity,
+        widget.point.severity,
       )!
           .toColor();
 
@@ -151,9 +175,17 @@ class _HeatPointWidgetState extends State<_HeatPointWidget> {
     Overlay.of(context).insert(_popupEntry!);
   }
 
+  double _calculateSize(double count) {
+    const minSize = 40.0;
+    const maxSize = 120.0;
+    final scaled = (count / 10).clamp(0.0, 1.0);
+    return minSize + scaled * (maxSize - minSize);
+  }
+
   @override
   Widget build(BuildContext context) {
-    final color = _baseColor.withValues(alpha: 0.75);
+    final color = _baseColor.withOpacity(0.75);
+    final size = _calculateSize(widget.point.count);
 
     return MouseRegion(
       onEnter: (_) => setState(() => _hovering = true),
@@ -163,8 +195,8 @@ class _HeatPointWidgetState extends State<_HeatPointWidget> {
         onTap: () => _showPopup(context),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 150),
-          width: _hovering ? 80 : 70,
-          height: _hovering ? 80 : 70,
+          width: _hovering ? size * 1.1 : size,
+          height: _hovering ? size * 1.1 : size,
           decoration: BoxDecoration(
             color: color,
             shape: BoxShape.circle,

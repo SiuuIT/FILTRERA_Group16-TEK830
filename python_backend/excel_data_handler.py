@@ -111,3 +111,6 @@ def apply_filters(df, filters: dict, threshold: int = 60, limit: int = 100):
     "descriptions": descriptions,
     "accident_reports": accident_reports,
   }
+
+
+

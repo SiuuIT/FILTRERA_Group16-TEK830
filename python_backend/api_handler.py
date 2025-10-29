@@ -40,12 +40,14 @@ def filter_data(request: FilterRequest):
         return JSONResponse(status_code=500, content={"error": "Excel-data kunde inte laddas."})
 
     try:
+        # Filter the dataframe
         result = apply_filters(df, request.filters, request.threshold, request.limit)
 
+        # AI analysis
         ai_summary = analyze_location_and_description(result.get("descriptions", []))
         severity_rankings = rank_incident_severity(result.get("accident_reports", []))
 
-        # Merge accident_reports and severity_rankings into a compact summary
+        #  Merge accident reports with AI severity
         merged_reports = []
         if isinstance(severity_rankings, list):
             for r in severity_rankings:
@@ -56,22 +58,49 @@ def filter_data(request: FilterRequest):
                     "severity": r.get("severity")
                 })
 
-        # Build minimal response
+        #  Build heatmap data: count + average severity per location
+        heatmap_data = {}
+        if isinstance(severity_rankings, list):
+            for r in severity_rankings:
+                loc = r.get("where")
+                sev = r.get("severity")
+                if not loc or not isinstance(sev, (int, float)):
+                    continue
+
+                if loc not in heatmap_data:
+                    heatmap_data[loc] = {"count": 0, "total_severity": 0}
+
+                heatmap_data[loc]["count"] += 1
+                heatmap_data[loc]["total_severity"] += sev
+
+        for loc, vals in heatmap_data.items():
+            total = vals["total_severity"]
+            count = vals["count"]
+            heatmap_data[loc]["avg_severity"] = round(total / count, 2)
+            del heatmap_data[loc]["total_severity"]
+
+        # Build final combined response
         clean_response = {
             "aggregates": result["aggregates"],
             "location_counts": result["location_counts"],
             "AIAnswer": ai_summary,
             "accident_reports": merged_reports[:20],  # limit to top N if desired
+            "heatmap_data": heatmap_data,  # 👈 NEW FIELD
         }
+
         print(clean_response)
         return clean_response
 
     except ValueError as e:
         logging.exception("Filter error")
         return JSONResponse(status_code=400, content={"error": str(e)})
+
     except Exception as e:
         logging.exception("Unknown error")
         return JSONResponse(status_code=500, content={"error": str(e)})
+
+
+
 
 @app.post("/ai-interpret-filters")
 def ai_interpret_filters(request: dict):
@@ -108,5 +137,9 @@ def get_unique_values(column: str = Query(..., description="Column to fetch uniq
 
     unique_values = df[column].dropna().unique().tolist()
     return {"values": unique_values}
+
+
+
+
 
 

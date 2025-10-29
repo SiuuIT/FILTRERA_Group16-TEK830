@@ -42,7 +42,7 @@ class StatisticsAreaWidget extends StatefulWidget {
   final List<Map<String, dynamic>> reports;
   final int accidentsCount;
   final int incidentsCount;
-  final bool isRefreshing; // NEW
+  final bool isRefreshing;
 
   StatisticsAreaWidget({
     Key? key,
@@ -50,7 +50,7 @@ class StatisticsAreaWidget extends StatefulWidget {
     required this.aiAnswer,
     this.locationCounts,
     required this.reports,
-    this.isRefreshing = false, // NEW
+    this.isRefreshing = false,
     String? accidentsKey,
     String? incidentsKey,
   })  : aggregates = aggregates,
@@ -122,7 +122,8 @@ class _StatisticsAreaWidgetState extends State<StatisticsAreaWidget> {
     final aiData = (widget.aiAnswer is Map<String, dynamic>)
         ? widget.aiAnswer as Map<String, dynamic>
         : {};
-    final locationCounts = widget.locationCounts ?? {};
+    // !!! renamed for clarity - now using heatmap data from backend
+    final heatmapData = widget.locationCounts ?? {};
 
     if (widget.isRefreshing || !isDataLoaded) {
       return const Center(
@@ -139,7 +140,6 @@ class _StatisticsAreaWidgetState extends State<StatisticsAreaWidget> {
         ),
       );
     }
-
 
     return ListView(
       padding: const EdgeInsets.all(8.0),
@@ -165,7 +165,8 @@ class _StatisticsAreaWidgetState extends State<StatisticsAreaWidget> {
             ),
           ),
         ),
-        FactoryHeatmapMVP(locationCounts: locationCounts),
+        // !!! updated parameter to match new FactoryHeatmapMVP signature
+        FactoryHeatmapMVP(heatmapData: heatmapData),
         const SizedBox(height: 16),
         const Text(
           "AI Safety Summary by Location",

@@ -112,7 +112,7 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {
         aggregates = Map<String, dynamic>.from(response['aggregates'] ?? {});
         aiAnswer = (rawAI is Map<String, dynamic>) ? rawAI : (rawAI == null ? null : {'summary:': rawAI.toString()});
-        locationCounts = Map<String, dynamic>.from(response['location_counts'] ?? {});
+        locationCounts = Map<String, dynamic>.from(response['heatmap_data'] ?? {});
         reports = (rawReports is List)
             ? rawReports.map<Map<String, dynamic>>((e) => Map<String, dynamic>.from(e as Map)).toList()
             : <Map<String, dynamic>>[];
