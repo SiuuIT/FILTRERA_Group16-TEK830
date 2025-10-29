@@ -86,9 +86,13 @@ class _StatisticsAreaWidgetState extends State<StatisticsAreaWidget> {
   bool isDataLoaded = false;
   bool isFirstBuild = true;
 
+  String _selectedCategory = 'all'; // !!
+  List<Map<String, dynamic>> _filteredReports = []; // !!
+
   @override
   void initState() {
     super.initState();
+    _filteredReports = widget.reports; // !!
     Future.delayed(Duration.zero, _updateLoadingState);
   }
 
@@ -102,7 +106,10 @@ class _StatisticsAreaWidgetState extends State<StatisticsAreaWidget> {
         oldWidget.aiAnswer != widget.aiAnswer;
 
     if (dataChanged) {
-      setState(() => isDataLoaded = false);
+      setState(() {
+        isDataLoaded = false;
+        _filteredReports = widget.reports; // !!
+      });
       Future.delayed(const Duration(milliseconds: 300), _updateLoadingState);
     }
   }
@@ -117,13 +124,112 @@ class _StatisticsAreaWidgetState extends State<StatisticsAreaWidget> {
     }
   }
 
+  // !! filter toggle handler
+  void _updateCategoryFilter(String newCategory) {
+    setState(() {
+      _selectedCategory = newCategory;
+      if (newCategory == 'all') {
+        _filteredReports = widget.reports;
+      } else {
+        _filteredReports = widget.reports
+            .where((r) => (r['category'] ?? '').toString().toLowerCase() == newCategory)
+            .toList();
+      }
+    });
+  }
+
+  // !! recompute map intensity based on filtered type
+  Map<String, dynamic> _buildFilteredHeatmapData() {
+    if (widget.locationCounts == null) return {};
+
+    if (_selectedCategory == 'all') {
+      return widget.locationCounts!;
+    }
+
+    final Map<String, dynamic> newData = {};
+    final filtered = widget.reports
+        .where((r) => (r['category'] ?? '').toString().toLowerCase() == _selectedCategory)
+        .toList();
+
+    for (var r in filtered) {
+      final where = (r['where'] ?? '').toString().trim();
+      final sev = (r['severity'] ?? 0);
+      if (where.isEmpty) continue;
+
+      if (!newData.containsKey(where)) {
+        newData[where] = {'count': 0, 'total_severity': 0.0};
+      }
+      newData[where]['count'] += 1;
+      newData[where]['total_severity'] +=
+          (sev is num ? sev.toDouble() : double.tryParse(sev.toString()) ?? 0.0);
+    }
+
+    for (final entry in newData.entries) {
+      final total = entry.value['total_severity'] as double;
+      final count = entry.value['count'] as int;
+      entry.value['avg_severity'] = count == 0 ? 0.0 : total / count;
+      entry.value.remove('total_severity');
+    }
+
+    return newData;
+  }
+
+  // !! build legend UI
+  Widget _buildLegendBar() {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              const Text("Risk Level: ", style: TextStyle(fontWeight: FontWeight.w600)),
+              _legendDot(Colors.yellow.shade600),
+              const SizedBox(width: 4),
+              const Text("Low (1–3)"),
+              const SizedBox(width: 12),
+              _legendDot(Colors.orange.shade700),
+              const SizedBox(width: 4),
+              const Text("Medium (4–6)"),
+              const SizedBox(width: 12),
+              _legendDot(Colors.red.shade700),
+              const SizedBox(width: 4),
+              const Text("High (7–10)"),
+            ],
+          ),
+          const Text(
+            "Larger circles = More I&A events  ℹ️",
+            style: TextStyle(fontSize: 12, color: Colors.black87),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // !! helper for dots
+  Widget _legendDot(Color color) {
+    return Container(
+      width: 14,
+      height: 14,
+      margin: const EdgeInsets.only(right: 4),
+      decoration: BoxDecoration(
+        color: color,
+        shape: BoxShape.circle,
+        border: Border.all(color: Colors.black54, width: 1),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final aiData = (widget.aiAnswer is Map<String, dynamic>)
         ? widget.aiAnswer as Map<String, dynamic>
         : {};
-    // !!! renamed for clarity - now using heatmap data from backend
-    final heatmapData = widget.locationCounts ?? {};
 
     if (widget.isRefreshing || !isDataLoaded) {
       return const Center(
@@ -144,6 +250,7 @@ class _StatisticsAreaWidgetState extends State<StatisticsAreaWidget> {
     return ListView(
       padding: const EdgeInsets.all(8.0),
       children: [
+        // section title
         Container(
           decoration: BoxDecoration(
             color: Colors.white,
@@ -165,14 +272,49 @@ class _StatisticsAreaWidgetState extends State<StatisticsAreaWidget> {
             ),
           ),
         ),
-        // !!! updated parameter to match new FactoryHeatmapMVP signature
-        FactoryHeatmapMVP(heatmapData: heatmapData, reports: widget.reports,),
+
+        const SizedBox(height: 8),
+
+        // !! category toggle
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ChoiceChip(
+              label: const Text('All'),
+              selected: _selectedCategory == 'all',
+              onSelected: (_) => _updateCategoryFilter('all'),
+            ),
+            const SizedBox(width: 8),
+            ChoiceChip(
+              label: const Text('Accidents'),
+              selected: _selectedCategory == 'accident',
+              onSelected: (_) => _updateCategoryFilter('accident'),
+            ),
+            const SizedBox(width: 8),
+            ChoiceChip(
+              label: const Text('Incidents'),
+              selected: _selectedCategory == 'incident',
+              onSelected: (_) => _updateCategoryFilter('incident'),
+            ),
+          ],
+        ),
+
+        // !! legend
+        _buildLegendBar(),
+
+        // !! heatmap
+        FactoryHeatmapMVP(
+          heatmapData: _buildFilteredHeatmapData(),
+          reports: _filteredReports,
+        ),
+
         const SizedBox(height: 16),
         const Text(
           "AI Safety Summary by Location",
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
+
         if (aiData.isNotEmpty)
           ...aiData.entries.map((entry) {
             final location = entry.key;
@@ -222,7 +364,9 @@ class _StatisticsAreaWidgetState extends State<StatisticsAreaWidget> {
             padding: EdgeInsets.all(12),
             child: Text("No AI analysis available yet."),
           ),
+
         const SizedBox(height: 16),
+
         RecentAccidentsList(reports: widget.reports),
         SafetyIncidentReportCard(
           factoryName: "Factory B - South Plant",

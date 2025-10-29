@@ -35,16 +35,16 @@ class FactoryHeatmapMVP extends StatelessWidget {
   });
 
   Map<String, Offset> get _locationCoordinates => {
-        'Warehouse Zone A': const Offset(0.10, 0.70),
-        'Warehouse Zone B': const Offset(0.30, 0.70),
-        'Loading Dock': const Offset(0.25, 0.43),
-        'Maintenance Bay': const Offset(0.45, 0.40),
-        'Storage Yard': const Offset(0.45, 0.17),
-        'Wood Cutting Section': const Offset(0.80, 0.15),
-        'Finishing Line': const Offset(0.51, 0.65),
-        'Packaging Line': const Offset(0.51, 0.90),
-        'Assembly Area': const Offset(0.80, 0.55),
-        'Varnish Room': const Offset(0.70, 0.85),
+        'Warehouse Zone A': const Offset(0.10, 0.65),
+        'Warehouse Zone B': const Offset(0.30, 0.65),
+        'Loading Dock': const Offset(0.22, 0.37),
+        'Maintenance Bay': const Offset(0.45, 0.35),
+        'Storage Yard': const Offset(0.45, 0.09),
+        'Wood Cutting Section': const Offset(0.77, 0.10),
+        'Finishing Line': const Offset(0.45, 0.55),
+        'Packaging Line': const Offset(0.50, 0.82),
+        'Assembly Area': const Offset(0.77, 0.46),
+        'Varnish Room': const Offset(0.69, 0.80),
       };
 
   @override
@@ -101,21 +101,40 @@ class FactoryHeatmapMVP extends StatelessWidget {
     );
   }
 
-  List<HeatPoint> _generateHeatPoints(Map<String, dynamic> data) {
+      List<HeatPoint> _generateHeatPoints(Map<String, dynamic> data) {
     if (data.isEmpty) return [];
 
-    final maxCount = data.values
-        .map((v) => (v['count'] ?? 0).toDouble())
+    // get set of valid areas that actually exist in reports
+    final reportedAreas = reports
+        .map((r) => (r['where'] ?? '').toString().trim().toLowerCase())
+        .where((r) => r.isNotEmpty)
+        .toSet();
+
+    // find max values for normalization
+    final validEntries = data.entries.where((entry) {
+      final areaName = entry.key.toString().trim().toLowerCase();
+      final count = (entry.value['count'] ?? 0);
+      return reportedAreas.contains(areaName) && (count is num && count > 0);
+    }).toList();
+
+    if (validEntries.isEmpty) return [];
+
+    final maxCount = validEntries
+        .map((v) => (v.value['count'] ?? 0).toDouble())
         .fold<double>(0, (a, b) => a > b ? a : b);
 
-    final maxSeverity = data.values
-        .map((v) => (v['avg_severity'] ?? 0).toDouble())
+    final maxSeverity = validEntries
+        .map((v) => (v.value['avg_severity'] ?? 0).toDouble())
         .fold<double>(0, (a, b) => a > b ? a : b);
 
-    return data.entries.map((entry) {
+    // now create points only for truly existing reported areas
+    return validEntries.map((entry) {
       final area = entry.key;
       final value = entry.value as Map<String, dynamic>;
+
       final count = (value['count'] ?? 0).toDouble();
+      if (count <= 0) return null;
+
       final avgSeverity = (value['avg_severity'] ?? 0).toDouble();
       final pos = _locationCoordinates[area];
       if (pos == null) return null;
@@ -132,6 +151,8 @@ class FactoryHeatmapMVP extends StatelessWidget {
       );
     }).whereType<HeatPoint>().toList();
   }
+
+
 }
 
 // ------------------ POINT WIDGET ------------------
