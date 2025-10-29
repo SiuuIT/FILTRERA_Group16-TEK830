@@ -27,8 +27,12 @@ class FactoryLayout {
 // ------------------ MAIN SCREEN ------------------
 class FactoryHeatmapMVP extends StatelessWidget {
   final Map<String, dynamic> heatmapData;
-
-  const FactoryHeatmapMVP({super.key, required this.heatmapData});
+  final List<Map<String, dynamic>> reports; 
+  const FactoryHeatmapMVP({
+    super.key,
+    required this.heatmapData,
+    required this.reports, // !!
+  });
 
   Map<String, Offset> get _locationCoordinates => {
         'Warehouse Zone A': const Offset(0.10, 0.70),
@@ -80,7 +84,10 @@ class FactoryHeatmapMVP extends StatelessWidget {
                         return Positioned(
                           left: p.x * width,
                           top: p.y * height,
-                          child: _HeatPointWidget(point: p),
+                          child: _HeatPointWidget(
+                            point: p,
+                            allReports: reports,
+                          ),
                         );
                       }),
                     ],
@@ -88,7 +95,6 @@ class FactoryHeatmapMVP extends StatelessWidget {
                 },
               ),
             ),
-
           ),
         ),
       ),
@@ -131,7 +137,11 @@ class FactoryHeatmapMVP extends StatelessWidget {
 // ------------------ POINT WIDGET ------------------
 class _HeatPointWidget extends StatefulWidget {
   final HeatPoint point;
-  const _HeatPointWidget({required this.point});
+  final List<Map<String, dynamic>> allReports; // !! added field for all reports
+  const _HeatPointWidget({
+    required this.point,
+    required this.allReports, // !!
+  });
 
   @override
   State<_HeatPointWidget> createState() => _HeatPointWidgetState();
@@ -161,6 +171,14 @@ class _HeatPointWidgetState extends State<_HeatPointWidget> {
 
   void _showPopup(BuildContext context) {
     _removePopup();
+
+    // !! filter reports for this area
+    final matchingReports = widget.allReports
+        .where((r) =>
+            (r['where'] ?? '').toString().toLowerCase() ==
+            widget.point.area.toLowerCase())
+        .toList();
+
     final renderBox = context.findRenderObject() as RenderBox;
     final position = renderBox.localToGlobal(Offset.zero);
 
@@ -168,7 +186,11 @@ class _HeatPointWidgetState extends State<_HeatPointWidget> {
       builder: (context) => Positioned(
         left: position.dx + 70,
         top: position.dy - 20,
-        child: _InfoBox(area: widget.point.area, onClose: _removePopup),
+        child: _InfoBox(
+          area: widget.point.area,
+          reports: matchingReports, // !! pass filtered reports
+          onClose: _removePopup,
+        ),
       ),
     );
 
@@ -215,35 +237,34 @@ class _HeatPointWidgetState extends State<_HeatPointWidget> {
 class _InfoBox extends StatelessWidget {
   final String area;
   final VoidCallback onClose;
-  const _InfoBox({required this.area, required this.onClose});
+  final List<Map<String, dynamic>> reports; // !! added to display real reports
+
+  const _InfoBox({
+    required this.area,
+    required this.onClose,
+    required this.reports, // !!
+  });
 
   @override
   Widget build(BuildContext context) {
-    final items = List.generate(
-      15,
-      (i) => {
-        'category': i.isEven ? 'Accident' : 'Incident',
-        'severity': (i % 10 + 1).toString(),
-        'what': 'Example report #$i in $area',
-      },
-    );
-
     return Material(
       elevation: 8,
       borderRadius: BorderRadius.circular(8),
       color: Colors.white,
       child: Container(
-        width: 240,
-        height: 200,
+        width: 260,
+        height: 240,
         padding: const EdgeInsets.all(10),
         child: Column(
           children: [
             Row(
               children: [
                 Expanded(
-                  child: Text(area,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 14)),
+                  child: Text(
+                    area,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 14),
+                  ),
                 ),
                 IconButton(
                   onPressed: onClose,
@@ -258,19 +279,23 @@ class _InfoBox extends StatelessWidget {
                 thumbVisibility: true,
                 radius: const Radius.circular(6),
                 child: ListView.builder(
-                  itemCount: items.length,
+                  itemCount: reports.length, 
                   itemBuilder: (context, index) {
-                    final r = items[index];
+                    final r = reports[index]; 
+                    final category = r['category'] ?? 'unknown'; 
+                    final severity = r['severity'] ?? '-'; 
+                    final what = r['what'] ?? ''; 
+
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 4.0),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Icon(
-                            r['category'] == 'Accident'
+                            category == 'accident'
                                 ? Icons.warning
                                 : Icons.info,
-                            color: r['category'] == 'Accident'
+                            color: category == 'accident'
                                 ? Colors.red
                                 : Colors.orange,
                             size: 18,
@@ -278,7 +303,7 @@ class _InfoBox extends StatelessWidget {
                           const SizedBox(width: 6),
                           Expanded(
                             child: Text(
-                              '${r['category']} (Severity ${r['severity']})\n${r['what']}',
+                              '${category[0].toUpperCase()}${category.substring(1)} (Severity $severity)\n$what',
                               style: const TextStyle(fontSize: 12),
                             ),
                           ),

@@ -166,7 +166,7 @@ class _StatisticsAreaWidgetState extends State<StatisticsAreaWidget> {
           ),
         ),
         // !!! updated parameter to match new FactoryHeatmapMVP signature
-        FactoryHeatmapMVP(heatmapData: heatmapData),
+        FactoryHeatmapMVP(heatmapData: heatmapData, reports: widget.reports,),
         const SizedBox(height: 16),
         const Text(
           "AI Safety Summary by Location",
