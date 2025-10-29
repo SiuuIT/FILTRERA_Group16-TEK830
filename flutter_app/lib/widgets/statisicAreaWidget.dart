@@ -86,13 +86,13 @@ class _StatisticsAreaWidgetState extends State<StatisticsAreaWidget> {
   bool isDataLoaded = false;
   bool isFirstBuild = true;
 
-  String _selectedCategory = 'all'; // !!
-  List<Map<String, dynamic>> _filteredReports = []; // !!
+  String _selectedCategory = 'all'; 
+  List<Map<String, dynamic>> _filteredReports = []; 
 
   @override
   void initState() {
     super.initState();
-    _filteredReports = widget.reports; // !!
+    _filteredReports = widget.reports; 
     Future.delayed(Duration.zero, _updateLoadingState);
   }
 
@@ -283,18 +283,24 @@ class _StatisticsAreaWidgetState extends State<StatisticsAreaWidget> {
               label: const Text('All'),
               selected: _selectedCategory == 'all',
               onSelected: (_) => _updateCategoryFilter('all'),
+              selectedColor: Colors.grey.shade400,   
+              backgroundColor: Colors.grey.shade200,
             ),
             const SizedBox(width: 8),
             ChoiceChip(
               label: const Text('Accidents'),
               selected: _selectedCategory == 'accident',
               onSelected: (_) => _updateCategoryFilter('accident'),
+              selectedColor: Colors.grey.shade400,   
+              backgroundColor: Colors.grey.shade200,
             ),
             const SizedBox(width: 8),
             ChoiceChip(
               label: const Text('Incidents'),
               selected: _selectedCategory == 'incident',
               onSelected: (_) => _updateCategoryFilter('incident'),
+              selectedColor: Colors.grey.shade400,   
+              backgroundColor: Colors.grey.shade200,
             ),
           ],
         ),

@@ -191,32 +191,74 @@ class _HeatPointWidgetState extends State<_HeatPointWidget> {
   }
 
   void _showPopup(BuildContext context) {
-    _removePopup();
+  // !! filter reports for this area
+  final matchingReports = widget.allReports
+      .where((r) =>
+          (r['where'] ?? '').toString().toLowerCase() ==
+          widget.point.area.toLowerCase())
+      .toList();
 
-    // !! filter reports for this area
-    final matchingReports = widget.allReports
-        .where((r) =>
-            (r['where'] ?? '').toString().toLowerCase() ==
-            widget.point.area.toLowerCase())
-        .toList();
+  showDialog(
+    context: context,
+    barrierDismissible: true,
+    builder: (_) => AlertDialog(
+      backgroundColor: const Color(0xFFF8F8F8),
+      title: Text(widget.point.area,
+          style: const TextStyle(fontWeight: FontWeight.bold)),
+      content: SizedBox(
+        width: 280,
+        height: 260,
+        child: Scrollbar(
+          thumbVisibility: true,
+          radius: const Radius.circular(6),
+          child: ListView.builder(
+            itemCount: matchingReports.length,
+            itemBuilder: (context, index) {
+              final r = matchingReports[index];
+              final category = r['category'] ?? 'unknown';
+              final severity = r['severity'] ?? '-';
+              final what = r['what'] ?? '';
 
-    final renderBox = context.findRenderObject() as RenderBox;
-    final position = renderBox.localToGlobal(Offset.zero);
-
-    _popupEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        left: position.dx + 70,
-        top: position.dy - 20,
-        child: _InfoBox(
-          area: widget.point.area,
-          reports: matchingReports, // !! pass filtered reports
-          onClose: _removePopup,
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4.0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      category == 'accident' ? Icons.warning : Icons.info,
+                      color: category == 'accident'
+                          ? Colors.red
+                          : Colors.orange,
+                      size: 18,
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        '${category[0].toUpperCase()}${category.substring(1)} (Severity $severity)\n$what',
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
         ),
       ),
-    );
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.grey,
+          ),
+          child: const Text('Close'),
+        ),
+      ],
+    ),
+  );
+}
 
-    Overlay.of(context).insert(_popupEntry!);
-  }
 
   double _calculateSize(double count) {
     const minSize = 40.0;
