@@ -10,6 +10,7 @@ import pandas as pd
 # Fixed version with CORS, POST /filter, GET /columns, and GET /unique-values.
 #run this by this in terminal 
 # source .venv/Scripts/activate
+#$ source C:/Users/Admin/Desktop/my_projects/TEK830/.venv/Scripts/activate
 #cd python_backend
 # uvicorn api_handler:app --reload
 #also need to set up api key at start every server startup $env:OPENAI_API_KEY="sk-your-key-here"

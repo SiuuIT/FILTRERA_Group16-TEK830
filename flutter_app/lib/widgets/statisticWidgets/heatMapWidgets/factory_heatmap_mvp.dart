@@ -2,11 +2,17 @@ import 'package:flutter/material.dart';
 
 // ------------------ MODEL ------------------
 class HeatPoint {
-  final double x; // normalized 0–1
-  final double y; // normalized 0–1
-  final double intensity; // 0–1
+  final String area;
+  final double x;
+  final double y;
+  final double intensity;
 
-  HeatPoint({required this.x, required this.y, required this.intensity});
+  HeatPoint({
+    required this.area,
+    required this.x,
+    required this.y,
+    required this.intensity,
+  });
 }
 
 class FactoryLayout {
@@ -18,11 +24,10 @@ class FactoryLayout {
 
 // ------------------ MAIN SCREEN ------------------
 class FactoryHeatmapMVP extends StatelessWidget {
-  final Map<String, dynamic> locationCounts; // from backend JSON
+  final Map<String, dynamic> locationCounts;
 
   const FactoryHeatmapMVP({super.key, required this.locationCounts});
 
-  // --- Map each area name to approximate coordinates on the image ---
   Map<String, Offset> get _locationCoordinates => {
         'Warehouse Zone A': const Offset(0.10, 0.70),
         'Warehouse Zone B': const Offset(0.30, 0.70),
@@ -63,13 +68,14 @@ class FactoryHeatmapMVP extends StatelessWidget {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  // Background factory layout image
-                  Image.asset(
-                    factory.imageAsset,
-                    fit: BoxFit.contain,
-                  ),
-                  // Heatmap overlay
-                  CustomPaint(painter: HeatmapPainter(factory.points)),
+                  Image.asset(factory.imageAsset, fit: BoxFit.contain),
+                  ...factory.points.map((p) {
+                    return Positioned(
+                      left: p.x * MediaQuery.of(context).size.width * 0.9,
+                      top: p.y * MediaQuery.of(context).size.width * 0.5,
+                      child: _HeatPointWidget(point: p),
+                    );
+                  }),
                 ],
               ),
             ),
@@ -79,7 +85,6 @@ class FactoryHeatmapMVP extends StatelessWidget {
     );
   }
 
-  // --- Generate heat points dynamically from backend data ---
   List<HeatPoint> _generateHeatPoints(Map<String, dynamic> counts) {
     if (counts.isEmpty) return [];
 
@@ -92,52 +97,169 @@ class FactoryHeatmapMVP extends StatelessWidget {
       final area = entry.key;
       final count = (entry.value as num).toDouble();
       final normalized = (count / maxValue).clamp(0.0, 1.0);
-
       final pos = _locationCoordinates[area];
-      if (pos == null) return null; // skip unknown areas
-
-      return HeatPoint(x: pos.dx, y: pos.dy, intensity: normalized);
+      if (pos == null) return null;
+      return HeatPoint(area: area, x: pos.dx, y: pos.dy, intensity: normalized);
     }).whereType<HeatPoint>().toList();
   }
 }
 
-// ------------------ HEATMAP PAINTER ------------------
-class HeatmapPainter extends CustomPainter {
-  final List<HeatPoint> points;
-
-  HeatmapPainter(this.points);
+// ------------------ POINT WIDGET ------------------
+class _HeatPointWidget extends StatefulWidget {
+  final HeatPoint point;
+  const _HeatPointWidget({required this.point});
 
   @override
-  void paint(Canvas canvas, Size size) {
-    for (var p in points) {
-      final position = Offset(p.x * size.width, p.y * size.height);
+  State<_HeatPointWidget> createState() => _HeatPointWidgetState();
+}
 
-      // Radius scales with intensity: 5px (low) → 50x (high)
-      final radius = 5 + (p.intensity * 50);
+class _HeatPointWidgetState extends State<_HeatPointWidget> {
+  bool _hovering = false;
+  OverlayEntry? _popupEntry;
 
-      final paint = Paint()
-        ..shader = RadialGradient(
-          colors: [
-            _getColorForIntensity(p.intensity).withOpacity(0.8),
-            Colors.transparent,
+  Color get _baseColor => HSVColor.lerp(
+        HSVColor.fromColor(Colors.green),
+        HSVColor.fromColor(Colors.red),
+        widget.point.intensity,
+      )!
+          .toColor();
+
+  @override
+  void dispose() {
+    _removePopup();
+    super.dispose();
+  }
+
+  void _removePopup() {
+    _popupEntry?.remove();
+    _popupEntry = null;
+  }
+
+  void _showPopup(BuildContext context) {
+    _removePopup();
+    final renderBox = context.findRenderObject() as RenderBox;
+    final position = renderBox.localToGlobal(Offset.zero);
+
+    _popupEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        left: position.dx + 70,
+        top: position.dy - 20,
+        child: _InfoBox(area: widget.point.area, onClose: _removePopup),
+      ),
+    );
+
+    Overlay.of(context).insert(_popupEntry!);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final color = _baseColor.withValues(alpha: 0.75);
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovering = true),
+      onExit: (_) => setState(() => _hovering = false),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () => _showPopup(context),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          width: _hovering ? 80 : 70,
+          height: _hovering ? 80 : 70,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.black, width: 2),
+            boxShadow: _hovering
+                ? [BoxShadow(color: Colors.black38, blurRadius: 10, spreadRadius: 2)]
+                : [],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ------------------ POPUP INFO BOX ------------------
+class _InfoBox extends StatelessWidget {
+  final String area;
+  final VoidCallback onClose;
+  const _InfoBox({required this.area, required this.onClose});
+
+  @override
+  Widget build(BuildContext context) {
+    final items = List.generate(
+      15,
+      (i) => {
+        'category': i.isEven ? 'Accident' : 'Incident',
+        'severity': (i % 10 + 1).toString(),
+        'what': 'Example report #$i in $area',
+      },
+    );
+
+    return Material(
+      elevation: 8,
+      borderRadius: BorderRadius.circular(8),
+      color: Colors.white,
+      child: Container(
+        width: 240,
+        height: 200,
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(area,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 14)),
+                ),
+                IconButton(
+                  onPressed: onClose,
+                  icon: const Icon(Icons.close, size: 18),
+                  splashRadius: 18,
+                ),
+              ],
+            ),
+            const Divider(),
+            Expanded(
+              child: Scrollbar(
+                thumbVisibility: true,
+                radius: const Radius.circular(6),
+                child: ListView.builder(
+                  itemCount: items.length,
+                  itemBuilder: (context, index) {
+                    final r = items[index];
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4.0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(
+                            r['category'] == 'Accident'
+                                ? Icons.warning
+                                : Icons.info,
+                            color: r['category'] == 'Accident'
+                                ? Colors.red
+                                : Colors.orange,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              '${r['category']} (Severity ${r['severity']})\n${r['what']}',
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
           ],
-          stops: const [0.0, 1.0],
-        ).createShader(Rect.fromCircle(center: position, radius: radius));
-
-      canvas.drawCircle(position, radius, paint);
-    }
+        ),
+      ),
+    );
   }
-
-  // Color transitions smoothly between yellow (low) and red (high)
-  Color _getColorForIntensity(double value) {
-    return HSVColor.lerp(
-      HSVColor.fromColor(Colors.green),
-      HSVColor.fromColor(Colors.red),
-      value.clamp(0.0, 1.0),
-    )!
-        .toColor();
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => true;
 }
