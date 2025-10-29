@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from excel_data_handler import load_excel, apply_filters
-from ai_analysis import analyze_location_and_description,  rank_incident_severity 
+from ai_analysis import analyze_location_and_description,  rank_incident_severity, interpret_filter_prompt 
 import logging
 import pandas as pd
 # api_handler.py
@@ -73,6 +73,21 @@ def filter_data(request: FilterRequest):
         logging.exception("Unknown error")
         return JSONResponse(status_code=500, content={"error": str(e)})
 
+@app.post("/ai-interpret-filters")
+def ai_interpret_filters(request: dict):
+    prompt = request.get("prompt", "")
+
+    if not prompt:
+        return {"error": "Prompt missing."}
+    
+    available_factories = (
+        df["Factory"]
+        .dropna()
+        .astype(str)
+        .unique()
+        .tolist()
+    )
+    return interpret_filter_prompt(prompt,available_factories)
 
 
 

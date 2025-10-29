@@ -139,3 +139,47 @@ def rank_incident_severity(accident_reports: list[dict]) -> list[dict]:
 
     except Exception as e:
         return {"error": f"AI analysis failed: {e}"}
+
+
+def interpret_filter_prompt(prompt: str, available_factories: list[str]) -> dict:
+    """Interpret a natural language prompt into structured filter criteria."""
+    #remake prompt so gives factory, response body is now wrong
+    factories_list = ", ".join(available_factories[:50])
+    system_prompt = (
+        "You are an assistant for a factory safety analytics system. "
+        "Convert the user's request into a JSON object of filters. "
+        "Only use factory names from the following list:\n"
+        f"{factories_list}\n\n"
+        "If the user mentions a location that does not match any in the list, "
+        "choose the closest valid one by meaning.\n\n"
+        "Available filter fields: 'where did it happened', 'category', 'date'.\n"
+        "Always return a valid JSON structure like:\n"
+        "{\n"
+        "  'filters': {\n"
+        "    'where did it happened': ['Warehouse Zone A', 'Packaging Line'],\n"
+        "    'category': 'accident',\n"
+        "    'date': {'from': '2025-01-01', 'to': '2025-12-31'}\n"
+        "  }\n"
+        "}"
+    )
+
+    async def _call_openai():
+        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        response = await asyncio.to_thread(
+            client.chat.completions.create,
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.3,
+        )
+        print(response.choices[0].message.content.strip())
+        return response.choices[0].message.content.strip()
+        
+    try:
+        raw = asyncio.run(_call_openai())
+        return json.loads(raw)
+    except Exception as e:
+        return {"error": f"Failed to interpret prompt: {e}"}
+    
