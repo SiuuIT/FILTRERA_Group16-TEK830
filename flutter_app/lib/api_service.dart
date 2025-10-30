@@ -64,4 +64,19 @@ class ApiService {
       throw Exception('Backend error ${res.statusCode}: ${res.body}');
     }
   }
+  Future<Map<String, dynamic>?> interpretFilters(String prompt) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/ai-interpret-filters'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'prompt': prompt}),
+    );
+
+    if(response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      print( 'AI interpretation failed:${response.body}');
+      return null; 
+    }
+  }
+
 }
