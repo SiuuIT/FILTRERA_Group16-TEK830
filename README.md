@@ -1,8 +1,6 @@
 # FILTRERA
 Sustainable Digitalization in Practice Team 16
 
-jag hade gärna skrivit lite mer här honestly.
-
 The simplest way to test our prototype is with Docker, to avoid installing multiple python packages.
 Instructions
 1. Clone repo
