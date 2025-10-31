@@ -233,21 +233,16 @@ nav a.active {
 
 #top-background, #bottom-background {
   width: 100%;
-  aspect-ratio: 20 / 3;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
 }
 
-#top-background {
-  background-image: url("/src/resources/gustav-wilhelm-bilder/Upper-background-image.png");
+#top-background img,
+#bottom-background img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
 }
 
-#bottom-background {
-  background-image: url("/src/resources/gustav-wilhelm-bilder/down-background-image.png");
-}
-
-#introduction-content{
+#introduction-content {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -271,7 +266,7 @@ nav a.active {
   max-width: 800px;
 }
 
-#introduction-image{
+#introduction-image {
   width: 400px;
   height: auto;
 }
@@ -284,16 +279,6 @@ nav a.active {
 }
 
 @media (max-width: 1550px) {
-  #top-background, #bottom-background {
-    width: 100%;
-    height: auto;
-    min-height: 200px;
-    max-height: 800px;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-  }
-  
   #introduction-image-block {
     display: none;
   }
@@ -304,15 +289,18 @@ nav a.active {
     width: 90%;
     padding: 30px;
   }
-}
 
+  #top-background{
+    margin: 50px;
+  }
+}
 
 @media (max-width: 500px) {
   #introduction-text-block {
     width: 50%;
     padding: 30px;
   }
-  #introduction-text{
+  #introduction-text {
     width: 50%;
   }
 }
